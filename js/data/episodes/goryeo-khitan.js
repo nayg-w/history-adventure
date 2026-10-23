@@ -16,6 +16,7 @@
     official: { robe: '#5f8a52', dark: '#4b7040', hat: 'bokdu', expr: 'worried', hold: 'scroll' },
     gang: { robe: '#8e2a22', dark: '#6e1f19', hat: 'helmet', beard: 'white', armor: true, expr: 'proud' },
     bau: { robe: '#4a6a8a', dark: '#3a5670', hat: 'cap', expr: 'smile', hold: 'spear' },
+    messenger: { robe: '#8a6a3a', dark: '#6b5230', hat: 'cap', expr: 'worried', hold: 'scroll' },
   };
   const REAL = '실존 인물 · 대사는 창작';
   const FICTION = '게임 속 가상 인물';
@@ -25,32 +26,82 @@
     sosonnyeong: { name: '소손녕', tag: REAL, real: true, color: '#7a4a2a', portrait: () => fig(looks.sosonnyeong, { portrait: true }), bio: '거란의 장수. 993년 고려에 쳐들어와 서희와 담판을 벌였어요.' },
     official: { name: '근심 많은 관리', tag: FICTION, real: false, color: '#5f8a52', portrait: () => fig(looks.official, { portrait: true }), bio: '993년 고려 조정의 분위기를 전해 주는, 게임에서 만든 인물이에요.' },
     gang: { name: '강감찬', tag: REAL, real: true, color: '#8e2a22', portrait: () => fig(looks.gang, { portrait: true }), bio: '고려의 관리이자 장수(948~1031). 거란의 3차 침입 때 상원수(총사령관)가 되어 1019년 귀주대첩을 이끌었어요.' },
+    messenger: { name: '전령', tag: FICTION, real: false, color: '#8a6a3a', portrait: () => fig(looks.messenger, { portrait: true }), bio: '급한 소식을 전하는 사람. 게임에서 만든 인물이지만, 전하는 소식은 실제 기록에 있는 일이에요.' },
     bau: { name: '병사 바우', tag: FICTION, real: false, color: '#4a6a8a', portrait: () => fig(looks.bau, { portrait: true }), bio: '흥화진 근처 고려군 진영의 젊은 병사. 게임에서 만든 인물이에요.' },
   };
 
   /* ---------- 단서 (실제 역사) ---------- */
+
+  /* ---------- 단서: 하나만으로는 답이 되지 않는 '부분 정보' ---------- */
   const clues = {
-    claims: { icon: '📜', title: '소손녕의 두 가지 주장', short: '고구려 땅 · 송과의 교류', year: '993년', kind: 'history',
-      text: '① 고려는 신라 땅에서 일어났으니 고구려의 옛 땅은 거란의 것이다. ② 고려는 거란과 땅이 맞닿아 있는데 왜 바다 건너 송과만 교류하는가? (실제 담판에서 소손녕이 한 주장이에요.)' },
-    name: { icon: '🚩', title: "나라 이름 '고려'", short: '고구려를 잇는다는 뜻', kind: 'history',
-      text: "'고려'라는 이름에는 고구려를 이어받았다는 뜻이 담겨 있어요. 고려는 고구려의 옛 도읍 평양을 '서경'이라 부르며 중요하게 여겼어요." },
-    jurchen: { icon: '🗺️', title: '압록강 가의 여진', short: '고려와 거란 사이를 막음', kind: 'history',
-      text: '압록강 주변에는 여진이 살고 있었어요. 그래서 고려와 거란 사이를 오가는 길이 막혀 있었어요.' },
-    balhae: { icon: '📚', title: '발해의 멸망', short: '거란이 발해를 무너뜨림', year: '926년', kind: 'history',
-      text: '926년 거란이 발해를 멸망시켰어요. 고려는 발해 사람들을 받아들이고, 거란을 경계했어요.' },
-    gangdong: { icon: '🧱', title: '강동 6주', short: '압록강 동쪽의 6개 성', year: '994년~', kind: 'history',
-      text: '서희의 담판 뒤 고려는 압록강 동쪽의 여진을 몰아내고 흥화진·용주·통주·철주·귀주·곽주에 성을 쌓았어요. 고려의 땅이 압록강까지 넓어졌어요.' },
-    invasion2: { icon: '🔥', title: '거란의 2차 침입', short: '개경이 함락됨', year: '1010년', kind: 'history',
-      text: '1010년 거란 임금이 직접 군대를 이끌고 쳐들어왔어요. 개경이 함락되어 현종은 남쪽 나주까지 피란했어요. 양규 등이 끝까지 맞서 싸웠어요.' },
-    demand: { icon: '✉️', title: '거란의 요구', short: '강동 6주를 돌려 달라', year: '1018년', kind: 'history',
-      text: '거란은 고려 임금이 직접 와서 예를 갖출 것과 강동 6주를 돌려줄 것을 요구했어요. 고려가 거절하자 1018년 소배압이 10만 군사를 이끌고 세 번째로 쳐들어왔어요.' },
-    heunghwa: { icon: '🌊', title: '흥화진 냇물 작전', short: '쇠가죽으로 막았다 터뜨림', year: '1018년', kind: 'history',
-      text: '강감찬은 쇠가죽(소가죽)을 밧줄로 꿰어 냇물을 막고 기병을 숨겨 두었다가, 거란군이 건널 때 물을 터뜨리고 공격했다고 전해져요.' },
-    guiju: { icon: '🏆', title: '귀주대첩', short: '강감찬의 큰 승리', year: '1019년', kind: 'history',
-      text: '1019년 강감찬이 이끄는 고려군이 귀주에서 돌아가던 거란군을 크게 물리쳤어요. 살아 돌아간 거란군은 몇 천 명뿐이었다고 해요.' },
+    claimLand: { icon: '📜', title: '소손녕의 주장 ①', short: '고구려 땅은 거란 것?', kind: 'history',
+      text: "정찰 보고: 소손녕은 '고려는 신라 땅에서 일어난 나라다. 고구려의 옛 땅은 거란의 것이다!'라고 말한대요." },
+    claimSong: { icon: '🗯️', title: '소손녕의 주장 ②', short: '왜 송과만 사귀나?', kind: 'history',
+      text: "거란 쪽의 불평: '고려는 땅이 맞닿은 거란을 두고, 바다 건너 송나라와만 사귄다!'" },
+    nameGoryeo: { icon: '🚩', title: "나라 이름 '高麗'", short: '우리 나라의 이름', kind: 'history',
+      text: "우리 나라의 이름은 '고려(高麗)'예요. 어디서 들어 본 이름과 닮지 않았나요?" },
+    seogyeong: { icon: '🏙️', title: '서경(평양)', short: '고려가 아끼는 도시', kind: 'history',
+      text: "고려는 평양을 '서경'이라 부르며 아주 중요하게 여겨요. 평양은 오래전 고구려의 도읍이었어요." },
+    jurchen: { icon: '🗺️', title: '압록강 가의 여진', short: '고려와 거란 사이', kind: 'history',
+      text: '지도를 보면 압록강 주변에 여진이 살고 있어요. 고려와 거란 사이에 여진의 땅이 끼어 있어요.' },
+    anyung: { icon: '📯', title: '안융진의 급보', short: '거란군이 멈췄다', kind: 'history',
+      text: "급보: 소손녕의 군대가 안융진을 공격했다가 고려군에게 막혔어요. 그 뒤로 거란군은 더 내려오지 않고 '항복하라'는 글만 보내고 있어요." },
+    balhae: { icon: '📚', title: '발해의 멸망', short: '거란이 무너뜨린 나라', kind: 'history',
+      text: '옛 기록: 거란이 발해를 멸망시켰어요. 그 뒤 고려는 발해 사람들을 받아들이고 거란을 경계했어요.' },
+    gangdong: { icon: '🧱', title: '강동 6주', short: '담판으로 얻은 땅의 성', kind: 'history',
+      text: '서희의 담판 뒤 고려는 여진을 몰아내고 압록강 동쪽에 흥화진·용주·통주·철주·귀주·곽주의 성을 쌓았어요.' },
+    invasion2: { icon: '🔥', title: '8년 전의 침입', short: '개경이 불탔다', kind: 'history',
+      text: '병사 바우의 이야기: 1010년 거란 임금이 직접 쳐들어와 개경이 함락되었고, 현종은 나주까지 피란했어요.' },
+    demand: { icon: '✉️', title: '거란이 보낸 글', short: '거란의 요구', kind: 'history',
+      text: "'고려 임금은 직접 와서 예를 갖추라. 그리고 ○○ 6주를 돌려 달라!' — 고려 조정은 거절했어요. (글자 일부가 번져 있어요)" },
+    scout: { icon: '🔭', title: '정찰병의 보고', short: '적이 건널 곳', kind: 'game',
+      text: '거란군은 흥화진 앞 냇물의 얕은 여울로 건너올 것 같아요. (정찰병과 여울의 위치는 게임 속 설정이에요)' },
+    heunghwa: { icon: '🌊', title: '흥화진 전투', short: '냇물을 막았다 터뜨림', kind: 'history',
+      text: '강감찬은 쇠가죽을 꿰어 큰 냇물을 막고 기병을 산골짜기에 숨겼다가, 적이 건널 때 물을 터뜨리고 공격했다고 전해져요.' },
+    guiju: { icon: '🏆', title: '귀주대첩', short: '강감찬의 큰 승리', kind: 'history',
+      text: '1019년, 강감찬이 이끄는 고려군이 귀주에서 돌아가던 거란군을 크게 물리쳤어요. 살아 돌아간 거란군은 몇 천 명뿐이었다고 해요.' },
   };
 
-  /* ---------- 도구 ---------- */
+  /* ---------- 추론: 단서 두 개를 이어 얻는 결론 ---------- */
+  const insights = {
+    heir: { from: ['nameGoryeo', 'seogyeong'], icon: '🔗', title: '고구려를 이은 나라', short: '고려 = 고구려의 계승자',
+      text: "나라 이름을 '고려'라 하고 고구려의 옛 도읍 평양을 서경으로 삼은 것은, 고려가 고구려를 이은 나라라는 근거예요.",
+      choices: [
+        { text: '고려는 고구려를 이어받은 나라라는 근거가 된다.', correct: true },
+        { text: '고려와 고구려는 같은 해에 세워졌다.', why: '단서에는 나라를 세운 해 이야기가 없어요.' },
+        { text: '평양은 원래 거란의 도읍이었다.', why: '단서를 다시 읽어 봐요. 평양은 누구의 도읍이었나요?' },
+      ] },
+    route: { from: ['jurchen', 'claimSong'], icon: '🚧', title: '막힌 길', short: '여진 때문에 오가기 어렵다',
+      text: '고려와 거란 사이에 여진의 땅이 있어 오가기 어려웠어요. 여진을 몰아내고 길을 열면 교류할 수 있어요.',
+      choices: [
+        { text: '여진 땅이 가운데 있어 거란과 오가기 어렵다. 길이 열리면 교류할 수 있다.', correct: true },
+        { text: '고려는 거란과 절대로 교류할 수 없다.', why: "'절대로'라고 할 근거가 단서에 있나요?" },
+        { text: '송나라가 여진을 보내 길을 막았다.', why: '단서에 그런 내용은 없어요. 확인된 것만 말해요.' },
+      ] },
+    aim: { from: ['anyung', 'claimSong'], icon: '🎯', title: '거란의 속셈', short: '싸움보다 교류를 원한다',
+      text: '거란군은 막힌 뒤 더 내려오지 않고 송과의 관계를 따졌어요. 거란이 바란 것은 땅보다, 고려가 송 대신 거란과 교류하는 것이었어요.',
+      choices: [
+        { text: '거란은 싸움보다, 고려가 송 대신 거란과 교류하기를 바라는 것 같다.', correct: true },
+        { text: '거란은 고려 땅을 모두 차지할 때까지 싸우려 한다.', why: '그렇다면 왜 더 내려오지 않고 글만 보내고 있을까요?' },
+        { text: '거란군은 이미 고려를 이겼다.', why: '안융진에서 누가 막혔는지 급보를 다시 봐요.' },
+      ] },
+    why3: { from: ['gangdong', 'demand'], icon: '🧩', title: '다시 쳐들어온 까닭', short: '거란이 6주를 원함',
+      text: '번진 글자는 바로 강동 6주! 서희가 얻은 강동 6주를 거란이 돌려 달라 했고, 고려가 거절하자 거란이 다시 쳐들어왔어요.',
+      choices: [
+        { text: '서희가 얻은 강동 6주를 거란이 되찾으려 했고, 고려가 거절했다.', correct: true },
+        { text: '고려가 송나라 땅을 빼앗았기 때문이다.', why: '두 단서에는 송나라 땅 이야기가 없어요.' },
+        { text: '서희가 담판에서 거짓 약속을 했기 때문이다.', why: '단서 어디에도 그런 말은 없어요. 거란이 무엇을 돌려 달라고 했나요?' },
+      ] },
+  };
+
+  /* ---------- 숨은 기록: 찾지 않아도 진행되지만, 찾으면 더 알게 되는 이야기 ---------- */
+  const secrets = {
+    coin: { title: '송나라에서 온 물건', kind: 'history', text: '고려는 송나라와 활발히 교류했어요. 송의 책과 비단 같은 물건이 고려에 들어왔지요. 거란은 이것이 못마땅했어요.' },
+    halji: { title: '땅을 떼어 주자는 의견', kind: 'history', text: "거란이 쳐들어오자 조정에서는 '서경 북쪽 땅을 떼어 주고 화해하자'는 의견까지 나왔어요. 서희는 이에 반대했어요." },
+    yanggyu: { title: '흥화진을 지킨 양규', kind: 'history', text: '1010년 2차 침입 때 양규는 흥화진을 굳게 지켜 냈고, 거란군에게 끌려가던 백성들을 구하기도 했어요.' },
+    nakseong: { title: '낙성대 이야기', kind: 'legend', text: "강감찬이 태어날 때 큰 별이 떨어졌다는 이야기가 전해져요. 그래서 그곳을 '낙성대'라고 불러요. (전해지는 이야기예요)" },
+  };
+
   const items = {
     cowhide: { icon: '🐂', title: '쇠가죽', text: '소의 가죽이에요. 단단하고 물이 잘 새지 않아요.' },
     rope: { icon: '🪢', title: '굵은 밧줄', text: '무언가를 줄줄이 꿰어 묶을 수 있어요.' },
@@ -58,199 +109,338 @@
   };
   const recipes = [
     { a: 'cowhide', b: 'rope', result: 'damKit',
-      lines: [{ who: 'pili', text: '밧줄로 쇠가죽을 줄줄이 꿰었어요! 이걸로 냇물을 막을 수 있겠어요.' }] },
+      lines: [{ who: 'pili', text: '밧줄로 쇠가죽을 줄줄이 꿰었어요! 이걸로 물을 막을 수 있겠어요.' }] },
   ];
 
-  /* ---------- 퍼즐 설정 ---------- */
+  /* ---------- 퍼즐 ① 외교 담판 ---------- */
+  const so = (text) => ({ who: 'sosonnyeong', text });
   const debate = {
-    goal: '소손녕의 주장에 맞는 단서 카드를 내밀어요',
+    goal: '담판으로 거란군을 돌려보내요',
+    caption: { year: '993년', place: '거란 진영' },
+    saveKey: 'debateStage',
     bg: ART.tent,
     left: 'seohui',
     right: 'sosonnyeong',
     leftFig: () => fig(looks.seohui),
     rightFig: () => fig(looks.sosonnyeong),
+    moodLabel: '소손녕의 태도',
+    startMood: 50,
     intro: [
-      { who: 'pili', text: '서희가 거란 진영에 도착했어요. 드디어 담판이 시작돼요!' },
-      { who: 'sosonnyeong', text: '나는 큰 나라의 귀한 장수요. 그대는 뜰 아래에서 내게 절을 하시오!' },
-      { who: 'seohui', text: '뜰에서 절하는 것은 신하가 임금을 뵐 때의 예법이오. 두 나라의 신하가 만나는 자리에서 어찌 그러겠소?' },
-      { who: 'pili', text: '기록에 따르면 서희는 숙소로 돌아가 물러서지 않았고, 결국 두 사람은 대등하게 마주 앉았대요.' },
-      { who: 'pili', text: '이제 소손녕의 말을 잘 듣고, 아래 카드 중에서 반박할 단서를 내밀어요!' },
+      { who: 'pili', text: '서희가 거란 진영에 도착했어요. 소손녕의 태도를 잘 살피며 협상해요!' },
+      { who: 'pili', text: '막히면 언제든 물러나서 더 조사할 수 있어요. 진행은 저장돼요.' },
     ],
-    rounds: [
+    resumeIntro: [{ who: 'pili', text: '다시 담판 자리로 돌아왔어요. 아까 멈춘 곳부터 이어 가요!' }],
+    breakLines: [
+      so('더 들을 것 없소! 돌아가시오!'),
+      { who: 'pili', text: '협상이 깨질 뻔했어요! 서희가 겨우 소손녕을 다시 자리에 앉혔어요. 이번엔 더 신중하게!' },
+    ],
+    stages: [
       {
+        type: 'stance', name: '예법',
+        prompt: '나는 큰 나라의 귀한 장수요. 그대는 뜰 아래에서 내게 절부터 하시오!',
+        choices: [
+          { text: '얼른 절하고 본론으로 들어간다', mood: -5,
+            lines: [{ who: 'seohui', text: '(잠깐… 처음부터 고개를 숙이면, 고려가 낮은 자리에서 협상하게 되겠지.)' }] },
+          { text: '칼을 뽑아 들고 맞선다', mood: -25,
+            lines: [so('감히 칼을 뽑아?!'), { who: 'seohui', text: '(아차, 싸우러 온 것이 아닌데… 이러면 군대가 쳐들어올 것이다.)' }] },
+          { text: '두 나라 신하는 대등하다며, 숙소로 돌아가 기다린다', ok: true,
+            lines: [
+              { who: 'seohui', text: '뜰에서 절하는 것은 신하가 임금을 뵐 때의 예법이오. 두 나라의 신하가 만나는데 어찌 그러겠소?' },
+              { who: 'pili', text: '기록에 따르면 서희는 숙소로 돌아가 물러서지 않았고, 결국 두 사람은 대등하게 마주 앉았대요.' },
+            ] },
+        ],
+        hints: ['두 나라의 신하가 만나는 자리예요. 누가 더 높고 낮을까요?', '서희는 고려를 낮추지도, 싸움을 걸지도 않았어요.'],
+      },
+      {
+        type: 'claim', name: '첫째 주장',
         claim: '고려는 신라 땅에서 일어난 나라요. 고구려의 옛 땅은 우리 거란의 것인데, 어찌 고려가 차지하고 있소?',
-        answer: 'name',
-        success: [
+        responses: {
+          heir: { result: 'win' },
+          nameGoryeo: { result: 'partial', text: '이름이 비슷하다고 고구려를 이었다 할 수 있소? 더 확실한 근거를 대 보시오!' },
+          seogyeong: { result: 'partial', text: '평양을 아낀다고? 그것만으로 고려가 고구려를 이었다는 말이오? 근거를 하나로 엮어 말해 보시오!' },
+          route: { result: 'partial', text: '그 이야기는 나중에 하시오. 지금은 땅 이야기를 하고 있소!' },
+          aim: { result: 'partial', text: '내 속셈을 읽었다고? 흥, 먼저 땅 이야기에나 답하시오!' },
+          claimLand: { result: 'miss', text: '그건 내가 한 말이오! 내 말에 대답을 하시오.' },
+          balhae: { result: 'miss', text: '발해를 들먹여 우리를 탓하려는 것이오?' },
+          anyung: { result: 'miss', text: '안융진 일로 나를 놀리는 것이오?!', mood: -20 },
+        },
+        missDefault: '그것으로는 나를 설득할 수 없소!',
+        win: [
           { who: 'seohui', text: "그렇지 않소. 우리나라는 고구려를 이은 나라요. 그래서 나라 이름을 '고려'라 하고, 평양을 서경으로 삼았소." },
           { who: 'seohui', text: '땅의 경계로 따진다면, 거란의 동경도 본래 고구려 땅이었으니 오히려 우리 땅이라 해야 하오!' },
-          { who: 'sosonnyeong', text: '으음…!' },
+          so('으음…!'),
         ],
-        wrong: {
-          claims: '그건 내가 한 말 아니오! 내 말을 되풀이해서 무엇 하겠소?',
-          balhae: '발해 이야기는 지금 상관없소! 고구려 땅이 누구 것이냐고 물었소.',
-          jurchen: '여진 이야기는 나중에 하시오. 고구려 땅의 주인이 누구냐고 물었소!',
-        },
         hints: [
-          '소손녕은 고려가 고구려와 상관없는 나라라고 해요. 고려가 고구려를 이었다는 걸 보여 줄 단서는 무엇일까요?',
-          "나라 이름에 비밀이 있어요. '나라 이름 고려' 카드를 내밀어 보세요!",
+          '소손녕은 고려가 고구려와 상관없는 나라라고 해요. 그 반대를 보여 줄 근거가 필요해요.',
+          "근거 하나로는 부족해요. 📖수첩 추론판에서 '나라 이름'과 다른 단서를 이어 보세요.",
+          "'나라 이름 高麗'와 '서경(평양)'을 이어 만든 추론 카드를 내밀어요.",
         ],
       },
       {
-        claim: '그렇다면 묻겠소. 고려는 우리 거란과 땅이 맞닿아 있는데, 어째서 바다 건너 송나라와만 사귀는 것이오?',
-        answer: 'jurchen',
-        success: [
-          { who: 'seohui', text: '압록강 안팎을 여진이 가로막고 있어서, 거란으로 가는 길이 막혀 있기 때문이오.' },
-          { who: 'seohui', text: '여진을 몰아내고 우리 옛 땅에 성을 쌓아 길을 통하게 한다면, 어찌 거란과 사귀지 않겠소?' },
-          { who: 'pili', text: "서희는 알아챘어요. 거란이 정말 바란 것은 땅보다 '고려가 송과 가까이 지내지 않는 것'이었어요!" },
-        ],
-        wrong: {
-          claims: '그건 내가 한 말 아니오! 왜 우리와 사귀지 않느냐고 물었소.',
-          name: '나라 이름 이야기는 이미 들었소. 왜 우리와 교류하지 않느냐고 물었소!',
-          balhae: '발해 일은 지난 일이오. 지금 왜 우리와 교류하지 않느냐 이 말이오!',
+        type: 'claim', name: '둘째 주장',
+        claim: '그렇다면 묻겠소. 고려는 우리와 땅이 맞닿아 있는데, 어째서 바다 건너 송나라와만 사귀는 것이오?',
+        responses: {
+          route: { result: 'win' },
+          jurchen: { result: 'partial', text: '여진이 사는 것은 나도 아오. 그래서 어쩌겠다는 것이오?' },
+          aim: { result: 'partial', text: '흠… 내 속을 꿰뚫어 보는구려. 하지만 먼저 대답하시오. 왜 우리와 사귀지 않소?', mood: 0 },
+          claimSong: { result: 'miss', text: '그건 내가 한 말 아니오! 대답을 하시오.' },
+          heir: { result: 'miss', text: '고구려 이야기는 이미 끝났소.', mood: -5 },
+          anyung: { result: 'miss', text: '안융진 일로 나를 놀리는 것이오?!', mood: -20 },
         },
+        missDefault: '동문서답이구려!',
+        win: [
+          { who: 'seohui', text: '압록강 안팎을 여진이 가로막고 있어, 거란으로 가는 길이 막혀 있기 때문이오.' },
+          { who: 'seohui', text: '여진을 몰아내고 우리 옛 땅에 성을 쌓아 길을 연다면, 어찌 거란과 사귀지 않겠소?' },
+          so('…그 말은 들어 볼 만하구려.'),
+        ],
         hints: [
-          '고려와 거란 사이에 무엇이 있어서 오가기 어려웠을까요? 지도에서 찾은 단서를 떠올려 봐요.',
-          "'압록강 가의 여진' 카드를 내밀어 보세요!",
+          '고려와 거란 사이에는 무엇이 있었나요? 지도를 떠올려 봐요.',
+          "'압록강 가의 여진'과 소손녕의 둘째 주장을 추론판에서 이어 보세요.",
+          "추론 카드 '막힌 길'을 내밀어요.",
+        ],
+      },
+      {
+        type: 'deal', name: '협상안',
+        prompt: '좋소. 그럼 고려는 무엇을 하고, 우리 거란은 무엇을 하자는 것이오?',
+        columns: [
+          { title: '고려가 약속할 것', options: [
+            { id: 'give', text: '서경 북쪽 땅을 거란에 떼어 준다', who: 'seohui', mood: -5 },
+            { id: 'trade', ok: true, text: '길이 열리면 거란과 사신을 주고받으며 교류한다' },
+            { id: 'ally', text: '송나라와 힘을 합쳐 거란을 막겠다고 경고한다', who: 'sosonnyeong', mood: -25 },
+          ] },
+          { title: '거란에게 요구할 것', options: [
+            { id: 'balhaeLand', text: '옛 발해 땅을 모두 고려에 돌려준다', who: 'sosonnyeong', mood: -15 },
+            { id: 'retreat', ok: true, text: '군대를 물리고, 압록강 동쪽 여진 땅을 고려가 차지하도록 인정한다' },
+            { id: 'apology', text: '거란 임금이 고려에 사과한다', who: 'sosonnyeong', mood: -20 },
+          ] },
+        ],
+        win: [
+          so('…좋소. 고려가 우리와 교류한다면 군대를 물리겠소. 압록강 동쪽 땅도 고려가 차지하시오.'),
+          { who: 'pili', text: '서희는 거란이 진짜 바라는 것을 꿰뚫어 보고, 싸우지 않고 땅까지 얻어 냈어요!' },
+        ],
+        hints: [
+          "거란이 진짜 바라는 것이 무엇이었죠? 추론판의 '거란의 속셈'을 떠올려 봐요.",
+          '땅은 내주지 않으면서, 거란이 원하는 것을 주는 방법은? 그리고 우리가 얻을 것은 막힌 길 너머의 땅!',
+          "'거란과 교류한다'와 '군대를 물리고 압록강 동쪽 땅을 인정한다'를 골라요.",
         ],
       },
     ],
-    wrongDefault: '그것으로는 나를 설득할 수 없소!',
-    outro: [
-      { who: 'sosonnyeong', text: '…그대의 말에 일리가 있소. 군대를 물리겠소.' },
-      { who: 'pili', text: '서희가 싸우지 않고 말로 거란군을 돌려보냈어요!' },
-      { who: 'pili', text: '게다가 압록강 동쪽 땅에 성을 쌓아도 좋다는 약속까지 받아 냈어요.' },
-    ],
+    outro: [{ who: 'pili', text: '실제 역사에서도 993년 서희의 담판 뒤 거란군은 물러갔어요.' }],
   };
+  // 협상안에서 고르면 나오는 반응
+  const dealReact = {
+    give: '땅을 내주지 않으려고 여기 온 것 아니었소? 다른 방법을 찾아야 하오.',
+    ally: '지금 전쟁을 하자는 것이오?!',
+    balhaeLand: '발해 땅을 통째로 내놓으라고? 어림없소!',
+    apology: '우리 황제께 사과를 하라고?! 무례하오!',
+  };
+  debate.stages[3].columns.forEach((c) => c.options.forEach((o) => (o.react = dealReact[o.id])));
 
+  /* ---------- 퍼즐 ② 강동 6주 ---------- */
   const M = ART.map;
+  const castleTokens = [
+    { id: 'heunghwa', label: '흥화진', x: 250, y: 242 },
+    { id: 'yong', label: '용주', x: 262, y: 286 },
+    { id: 'cheol', label: '철주', x: 290, y: 330 },
+    { id: 'tong', label: '통주', x: 340, y: 312 },
+    { id: 'gwak', label: '곽주', x: 318, y: 362 },
+    { id: 'gwi', label: '귀주', x: 400, y: 268 },
+  ];
   const mapCfg = {
-    goal: '강동 6주를 알맞은 곳에 쌓아요',
-    caption: { year: '994년~', place: '압록강 동쪽' },
+    goal: '담판으로 얻은 땅에 성 6개를 쌓아요',
+    caption: { year: '994년~', place: '새로 얻은 땅' },
     title: '강동 6주 쌓기',
-    text: '고려는 압록강 동쪽의 여진을 몰아내고 성 6개를 쌓았어요. 성을 지도 위 알맞은 곳에 끌어다 놓거나, 성을 누른 다음 지도를 눌러요.',
+    text: '고려는 여진을 몰아내고 성 6개를 쌓았어요. 담판에서 인정받은 땅은 어디였을까요? 성을 지도에 끌어다 놓거나, 성을 누른 뒤 지도를 눌러요.',
     base: ART.mapBase,
     zones: {
       gangdong: { poly: M.zones.gangdong, label: '압록강과 청천강 사이 바닷가 쪽' },
-      khitan: { poly: M.zones.khitan, label: '압록강 북쪽', feedback: '압록강 너머 북쪽은 거란 땅이에요. 압록강 안쪽, 고려 쪽에 쌓아야 해요!' },
-      inland: { poly: M.zones.inland, label: '압록강과 청천강 사이 깊은 산골', feedback: '조금 더 서쪽이에요! 6주는 바다와 가까운 쪽에 쌓았어요.' },
-      south: { poly: M.zones.south, label: '청천강 남쪽', feedback: '청천강 남쪽은 이미 고려가 다스리던 땅이에요(서경이 있는 곳). 더 북쪽으로!' },
+      khitan: { poly: M.zones.khitan, label: '압록강 북쪽', feedback: '여기는 압록강 너머, 거란 땅이에요. 담판에서 얻은 땅은 강의 어느 쪽이었나요?' },
+      inland: { poly: M.zones.inland, label: '압록강과 청천강 사이 깊은 산골', feedback: '방향은 맞아요! 그런데 6주는 이보다 바다 쪽, 서쪽 길을 따라 쌓았어요.' },
+      south: { poly: M.zones.south, label: '청천강 남쪽', feedback: '여기는 이미 고려가 다스리던 곳이에요(서경 근처). 새로 얻은 땅은 더 북쪽이에요.' },
     },
     correctZone: 'gangdong',
     outside: '바다에는 성을 쌓을 수 없어요!',
-    tokens: [
-      { id: 'heunghwa', label: '흥화진', x: 250, y: 242 },
-      { id: 'yong', label: '용주', x: 262, y: 286 },
-      { id: 'cheol', label: '철주', x: 290, y: 330 },
-      { id: 'tong', label: '통주', x: 340, y: 312 },
-      { id: 'gwak', label: '곽주', x: 318, y: 362 },
-      { id: 'gwi', label: '귀주', x: 400, y: 268 },
-    ],
+    tokens: castleTokens,
     borderPath: M.rivers.amnok,
     doneLabel: '강동 6주 완성! 고려의 땅이 압록강까지 넓어졌어요.',
     intro: [
-      { who: 'pili', text: '994년부터 고려는 압록강 동쪽의 여진을 몰아내고 성을 쌓기 시작했어요. 서희가 앞장섰지요.' },
-      { who: 'pili', text: "'강동'은 '강의 동쪽'이라는 뜻이에요. 6개의 성을 지도의 알맞은 곳에 놓아 볼까요?" },
+      { who: 'pili', text: '994년부터 고려는 여진을 몰아내고 성을 쌓기 시작했어요. 서희가 앞장섰지요.' },
+      { who: 'pili', text: '협상안에서 거란이 인정한 땅을 떠올려 6개의 성을 놓아 볼까요?' },
     ],
     hints: [
-      "'강동'은 강의 동쪽이라는 뜻이에요. 어느 강일까요? 수첩의 '압록강 가의 여진' 단서를 떠올려 봐요.",
+      '협상안에서 거란은 어느 강의 어느 쪽 땅을 인정했나요?',
+      "이 성들을 '강동 6주'라고 해요. '강동'은 '강의 동쪽'이라는 뜻이에요.",
       '압록강과 청천강 사이, 바닷가 쪽이에요. 지도에 빛나는 곳을 보세요!',
     ],
     success: [
       { who: 'pili', text: "고려의 땅이 압록강까지 넓어졌어요! 이 성들을 '강동 6주'라고 불러요." },
-      { who: 'pili', text: "'흥화진'과 '귀주'를 기억해 두세요. 곧 다시 나온답니다!" },
+      { who: 'pili', text: '이 성들은 나중에 아주 중요한 역할을 해요. 잘 기억해 두세요!' },
     ],
   };
 
-  const damCfg = {
-    goal: '강감찬의 냇물 작전을 펼쳐요',
+  /* ---------- 퍼즐 ③ 흥화진 작전도 ---------- */
+  const planCfg = {
+    goal: '작전도를 짜서 흥화진 앞에서 거란군을 막아요',
     caption: { year: '1018년 12월', place: '흥화진 앞 냇물' },
-    bg: ART.damField,
-    kit: { label: '쇠가죽 둑', icon: '🛡️' },
-    steps: ['쇠가죽 둑으로 냇물 위쪽 막기', '골짜기 숲에 기병 숨기기', '거란군이 냇바닥을 건널 때 둑 터뜨리기'],
-    intro: [
-      { who: 'gang', text: '적은 흥화진 앞 냇물을 건너올 것이오. 작전은 세 가지요.' },
-      { who: 'gang', text: '첫째, 쇠가죽 둑으로 냇물 위쪽을 막는다. 둘째, 기병을 골짜기 숲에 숨긴다.' },
-      { who: 'gang', text: '셋째, 적이 마른 냇바닥을 건널 때 둑을 터뜨린다!' },
+    bg: ART.planField,
+    river: ART.river,
+    note: '기록에 전하는 작전: 쇠가죽으로 큰 냇물을 막고, 기병을 산골짜기에 숨겼다가, 적이 건널 때 물을 터뜨려 공격했다. (지도·자리·시점 고르기는 게임을 위해 만든 것)',
+    tokens: [
+      { id: 'dam', type: 'dam', icon: '🛡️', label: '쇠가죽 둑' },
+      { id: 'ambush', type: 'ambush', icon: '🐎', label: '숨은 기병' },
     ],
-    msg: {
-      start: "오른쪽 '쇠가죽 둑'을 왼쪽 '둑 자리'로 끌어다 놓아요. (눌러서 고른 뒤 둑 자리를 눌러도 돼요)",
-      pickSpot: "이제 왼쪽의 '둑 자리'를 눌러요.",
-      needKit: "먼저 오른쪽 '쇠가죽 둑'을 골라요.",
-      wrongSpot: "거기가 아니에요. 냇물 위쪽(왼쪽)의 '둑 자리'에 놓아요.",
-      dammed: '냇물이 막혔어요! 아래쪽 냇바닥이 말라 가요.',
-      hidden: '기병들이 골짜기 숲에 몸을 숨겼어요.',
-      hideFirst: '아직이에요! 먼저 골짜기 숲에 기병을 숨겨요.',
-      wait: '거란군이 다가와요… 냇바닥 한가운데에 들어올 때를 기다려요!',
-      now: '지금이에요! 둑을 터뜨려요!',
-      early: '아직이에요! 거란군이 냇바닥 한가운데에 들어올 때까지 기다려요.',
-      missed: '거란군이 지나가 버렸어요. 곧 다음 무리가 와요!',
-      success: '물이 쏟아져 거란군이 흩어졌어요!',
+    floodSpot: 'd2',
+    spots: [
+      { id: 'd1', type: 'dam', x: 200, y: 380, label: '냇물 왼쪽', ok: true },
+      { id: 'd2', type: 'dam', x: 900, y: 392, label: '냇물 오른쪽',
+        fail: '둑이 여울보다 물이 흘러가는 쪽에 있어서, 여울에 오히려 물이 차올랐어요. 거란군은 건너기를 멈췄어요.' },
+      { id: 'd3', type: 'dam', x: 790, y: 200, label: '작은 물줄기',
+        fail: '이 물줄기는 여울을 지난 뒤에야 큰 냇물과 만나요. 여울의 물은 그대로였어요.' },
+      { id: 'a1', type: 'ambush', x: 780, y: 610, label: '골짜기 숲', ok: true },
+      { id: 'a2', type: 'ambush', x: 440, y: 548, label: '탁 트인 눈밭',
+        fail: '탁 트인 눈밭이라 숨은 기병이 거란군 눈에 띄었어요! 거란군이 경계하며 멈췄어요.' },
+      { id: 'a3', type: 'ambush', x: 150, y: 540, label: '흥화진 성 앞',
+        fail: '흥화진 성 앞은 여울에서 너무 멀어요. 기병이 닿기 전에 거란군이 정신을 차렸어요.' },
+    ],
+    timing: {
+      title: '언제 둑을 터뜨릴까?',
+      options: [
+        { id: 'early', text: '거란군이 냇물에 들어서기 전', fail: '물이 먼저 쏟아져 버려서, 거란군은 물이 빠질 때까지 기다렸어요.' },
+        { id: 'middle', text: '거란군이 냇물 한가운데를 건널 때', ok: true },
+        { id: 'late', text: '거란군이 모두 건넌 뒤', fail: '거란군이 이미 다 건너서 물살이 아무도 막지 못했어요.' },
+      ],
+    },
+    intro: [
+      { who: 'gang', text: '정찰병 말로는 적이 저 여울로 건너올 것이오.' },
+      { who: 'gang', text: '기록자, 작전도를 짜 보시오. 둑과 숨은 기병의 자리, 그리고 둑을 터뜨릴 때를 정하시오.' },
+    ],
+    hints: [
+      "물은 어느 쪽으로 흐르나요? 냇물 속 '>' 모양 물결을 보세요.",
+      '둑으로 물을 막으면 둑의 물 흘러가는 쪽이 말라요. 여울이 마르려면 둑은 어디에?',
+      '숨은 기병은 적의 눈에 띄지 않으면서도 여울과 가까워야 해요.',
+      "둑은 '냇물 왼쪽', 기병은 '골짜기 숲', 시점은 '한가운데'예요.",
+    ],
+    success: [
+      { who: 'gang', text: '물살에 적이 흩어졌다! 숨은 기병들, 공격하라!' },
+      { who: 'pili', text: '기록에 따르면 강감찬은 흥화진에서 이렇게 거란군에게 큰 피해를 주었어요.' },
+    ],
+  };
+
+  /* ---------- 퍼즐 ④ 3차 침입 작전 (개경 → 귀주) ---------- */
+  const campaignCfg = {
+    goal: '돌아가는 거란군을 막을 작전을 세워요',
+    caption: { year: '1018년 12월 ~ 1019년 2월', place: '거란의 3차 침입' },
+    saveKey: 'campaignPhase',
+    mapBase: ART.mapBase,
+    castles: castleTokens,
+    routeDown: 'M250 242 Q300 330 360 400 T470 520 T515 585',
+    routeBack: 'M512 578 Q470 500 440 420 T402 282',
+    intro: [
+      { who: 'pili', text: '흥화진에서 큰 피해를 입고도, 소배압은 개경을 노리고 남쪽으로 서둘러 내려갔어요.' },
+      { who: 'gang', text: '적의 다음 움직임을 내다봐야 하오. 들어온 정보를 살펴보시오.' },
+    ],
+    A: {
+      title: '거란군은 어떻게 할까?',
+      question: '정보 카드를 읽고, 거란군이 앞으로 어떻게 할지 예측해 보세요.',
+      intel: [
+        { icon: '🌾', title: '개경 주변 들판', text: '고려는 성 밖 백성을 성 안으로 들이고 들판을 비웠어요.' },
+        { icon: '🍚', title: '거란군의 사정', text: '먼 길을 서둘러 온 거란군은 가져온 식량이 줄어들고 있어요.' },
+        { icon: '🏯', title: '개경의 성벽', text: '개경 성 위에는 고려군이 단단히 지키고 있어요.' },
+      ],
+      options: [
+        { id: 'siege', text: '개경을 둘러싸고 오래오래 공격한다', why: '들판은 비었고 식량은 줄어드오. 적이 오래 버틸 수 있겠소?' },
+        { id: 'deeper', text: '개경을 지나쳐 더 남쪽으로 내려간다', why: '단단한 성을 등 뒤에 두고 더 깊이 들어가면, 돌아갈 길은 어찌 되겠소?' },
+        { id: 'back', text: '공격을 포기하고 거란으로 되돌아간다', ok: true },
+      ],
+      win: [
+        { who: 'gang', text: '그렇소! 실제로 거란군은 개경 가까이까지 왔다가 되돌아가기 시작했소.' },
+        { who: 'gang', text: '이제 돌아가는 적을 어디서 막을지 정해야 하오.' },
+      ],
+    },
+    B: {
+      title: '어디서 기다릴까?',
+      question: '거란군은 압록강을 건너 돌아가려 해요. 고려군이 기다릴 곳을 지도에서 골라요.',
+      tip: '💡 25년 전, 서희의 담판 뒤에 쌓은 성들을 떠올려 보세요.',
+      targets: [
+        { id: 'gaegyeong', label: '개경', x: 470, y: 560, why: '거란군은 이미 개경을 떠나 북쪽으로 가고 있어요. 뒤에 남으면 따라잡기 어려워요.' },
+        { id: 'guiju', label: '귀주', x: 372, y: 236, ok: true, why: '귀주는 강동 6주 가운데 하나로, 거란군이 압록강으로 돌아가는 길목이에요!' },
+        { id: 'beyond', label: '압록강 너머', x: 400, y: 60, why: '압록강 너머는 거란 땅이에요. 적이 강을 건너기 전에, 고려 땅 안에서 막아야 해요.' },
+      ],
+      win: [
+        { who: 'gang', text: '귀주에서 기다리겠소!' },
+        { who: 'pili', text: '서희가 얻은 강동 6주의 성, 귀주가 25년 뒤 결전의 무대가 된 거예요!' },
+      ],
+    },
+    C: {
+      title: '귀주 · 1019년 2월',
+      bg: ART.guijuTop,
+      winds: ['north', 'north', 'calm', 'south', 'south'],
+      reinforceAt: 3,
+      goodWind: 'south',
+      windInfo: {
+        north: { name: '북풍', desc: '북쪽(거란군 쪽)에서 고려군 얼굴로 불어와요.', arrow: '↓' },
+        calm: { name: '바람 잠잠', desc: '바람이 거의 불지 않아요.', arrow: '·' },
+        south: { name: '남풍', desc: '남쪽(고려군 뒤)에서 거란군 쪽으로 불어요.', arrow: '↑' },
+      },
+      turnLog: [
+        '두 군대가 맞섰어요. 바람이 고려군 쪽으로 불어와요.',
+        '눈보라가 고려군의 앞을 가려요.',
+        '바람이 잦아들었어요. 거란군이 조금씩 물러나요.',
+        '남쪽에서 비바람이 불기 시작했어요! 지원군도 도착했어요.',
+        '거란군이 압록강 쪽으로 빠져나가려 해요. 서둘러야 해요!',
+      ],
+      early: {
+        north: '바람이 우리 쪽으로 불어 화살이 힘을 잃고 앞이 보이지 않소! 일단 물러나 기회를 봅시다.',
+        calm: '아직 기세가 부족하오. 조금만 더 지켜봅시다.',
+      },
+      afterFail: '고려군이 물러나 다시 대열을 갖췄어요. 그사이 시간이 흘렀어요.',
+      escape: [
+        { who: 'gang', text: '거란군이 빠져나가 버렸소! 처음 상황부터 다시 살펴봅시다.' },
+        { who: 'pili', text: '(게임 속 재도전) 너무 오래 기다리면 기회를 놓쳐요.' },
+      ],
+      restart: '다시 두 군대가 맞섰어요.',
+      intro: [
+        { who: 'gang', text: '귀주에서 거란군과 맞섰소. 언제 총공격할지 판단해야 하오.' },
+        { who: 'pili', text: "바람의 방향과 지원군을 살펴봐요. '지켜본다'를 누르면 시간이 흘러요." },
+      ],
+      note: '기록: 싸움이 한창일 때 남쪽에서 비바람이 몰아쳐 깃발이 북쪽을 가리켰고, 김종현의 군사가 도착해 고려군이 크게 이겼어요. 공격할 때를 고르는 판단은 게임에서 만든 장치예요.',
+      banner: { title: '귀주대첩', sub: '1019년 · 강감찬' },
+      win: [
+        { who: 'pili', text: "고려군이 거란군을 크게 물리쳤어요! 이 싸움이 '귀주대첩'이에요." },
+        { who: 'pili', text: '살아 돌아간 거란군은 몇 천 명뿐이었다고 해요.' },
+      ],
     },
     hints: {
-      dam: "작전 1번! '쇠가죽 둑'을 냇물 왼쪽 '둑 자리'에 놓아요.",
-      hide: "작전 2번! 오른쪽 아래 '골짜기 숲'을 눌러 기병을 숨겨요.",
-      release: "거란군이 냇바닥 한가운데에 오면 '둑 터뜨리기!'를 눌러요. 놓쳐도 다음 무리가 와요.",
+      A: ['정보 카드 세 장을 모두 읽어 봐요. 들판이 비어 있다면 거란군은 무엇을 구하기 어려울까요?', '식량을 구하기 어려운 군대가 오래 머물 수 있을까요?'],
+      B: ['거란군은 어디로 돌아가나요? 그 길 위에 있는 고려의 성은?', '강동 6주 가운데, 돌아가는 길(점선) 위에 있는 성을 찾아봐요.', "'귀주'를 눌러 보세요."],
+      C: ['바람이 고려군 등 뒤에서 거란군 쪽으로 불 때가 유리해요.', "'남풍'일 때 총공격! 너무 오래 기다리면 거란군이 빠져나가요."],
     },
-    success: [
-      { who: 'gang', text: '지금이다! 숨어 있던 기병들, 공격하라!' },
-      { who: 'pili', text: '기록에 따르면 강감찬은 이렇게 흥화진에서 거란군에게 큰 피해를 주었대요.' },
-    ],
   };
 
-  const guijuCfg = {
-    goal: '깃발로 공격 신호를 보내요',
-    caption: { year: '1019년 2월', place: '귀주' },
-    bg: ART.guiju,
-    layer: () => {
-      const r = (c, f, list) => list.map(([x, y]) => `<g transform="translate(${x} ${y}) scale(1.4)">${HA.art.rider(c, f, 1)}</g>`).join('');
-      return `<svg viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
-        <g class="enemy-army">${r('#6b3f22', '#d9c3a0', [[820, 450], [900, 480], [980, 440], [1060, 470], [860, 530], [960, 540], [1050, 530], [1140, 500]])}</g>
-        <g class="ally-army">${r('#2f5d8a', '#b8352a', [[380, 520], [460, 560], [540, 520], [620, 560], [420, 620], [520, 640], [610, 620]])}</g>
-        <svg x="60" y="390" width="150" height="244" viewBox="0 0 160 260">${fig(looks.gang).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg>
-      </svg>`;
-    },
-    target: {
-      x: 200, y: 270, w: 150, h: 300, label: '고려군 깃발',
-      art: () => `<svg viewBox="0 0 150 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <path d="M30 296 V20" stroke="#5a4030" stroke-width="8"/>
-        <circle cx="30" cy="16" r="8" fill="#d4a63c"/>
-        <path class="flag-cloth" d="M34 26 Q90 16 146 30 Q126 70 146 110 Q90 100 34 112 Z" fill="#b8352a" stroke="#e8c55a" stroke-width="3"/>
-      </svg>`,
-    },
-    intro: [
-      { who: 'gang', text: '지친 거란군이 돌아가고 있구나. 여기 귀주에서 결판을 내자!' },
-      { who: 'pili', text: '기록에 따르면 싸움이 한창일 때 남쪽에서 비바람이 불어와, 고려군 깃발이 적군 쪽으로 휘날렸대요.' },
-      { who: 'pili', text: '바람이 고려군을 돕고 있어요!' },
-    ],
-    prompt: '반짝이는 깃발을 눌러 공격 신호를 보내요!',
-    hints: ['반짝이는 깃발을 눌러 보세요!'],
-    banner: { title: '귀주대첩', sub: '1019년 · 강감찬' },
-    success: [
-      { who: 'pili', text: "고려군이 거란군을 크게 물리쳤어요! 이 싸움을 '귀주대첩'이라고 해요." },
-      { who: 'pili', text: '거란군 10만 명 가운데 살아 돌아간 사람은 몇 천 명뿐이었다고 해요.' },
-    ],
-  };
-
+  /* ---------- 퍼즐 ⑤⑥ 기록 복원 ---------- */
   const timelineCfg = {
     goal: '기록 조각을 일어난 순서대로 놓아요',
     caption: { year: '시간의 서고', place: '기록 복원 ①' },
     title: '찢어진 기록 붙이기 ① — 순서',
-    text: '일이 일어난 순서대로 조각을 놓아요. 제자리에 놓인 조각에는 연도가 나타나요.',
+    text: '여행에서 겪은 일을 떠올려 순서대로 놓아요. 첫 확인에서는 몇 개가 맞았는지만 알려 줘요!',
+    countFirst: true,
     cards: [
       { id: 't1', icon: '📚', text: '거란이 발해를 멸망시키다', year: '926년' },
-      { id: 't2', icon: '🗣️', text: '서희가 소손녕과 담판을 벌이다', year: '993년' },
-      { id: 't3', icon: '🧱', text: '고려가 강동 6주를 쌓다', year: '994년~' },
-      { id: 't4', icon: '🔥', text: '거란의 2차 침입으로 개경이 함락되다', year: '1010년' },
-      { id: 't5', icon: '🌊', text: '흥화진에서 냇물을 터뜨려 거란군을 치다', year: '1018년' },
-      { id: 't6', icon: '🏆', text: '강감찬이 귀주에서 크게 이기다', year: '1019년' },
+      { id: 't2', icon: '📯', text: '소손녕의 군대가 안융진에서 막히다', year: '993년' },
+      { id: 't3', icon: '🗣️', text: '서희가 소손녕과 담판을 벌이다', year: '993년' },
+      { id: 't4', icon: '🧱', text: '고려가 강동 6주를 쌓다', year: '994년~' },
+      { id: 't5', icon: '🔥', text: '거란의 2차 침입, 개경이 함락되다', year: '1010년' },
+      { id: 't6', icon: '✉️', text: '거란이 강동 6주를 돌려 달라고 하다', year: '1010년 이후' },
+      { id: 't7', icon: '🌊', text: '흥화진에서 냇물을 터뜨려 거란군을 치다', year: '1018년' },
+      { id: 't8', icon: '🏆', text: '강감찬이 귀주에서 크게 이기다', year: '1019년' },
     ],
     intro: [
-      { who: 'pili', text: '기록자님 덕분에 단서가 모두 모였어요!' },
-      { who: 'pili', text: '먼저 찢어진 기록 조각을 일어난 순서대로 붙여 봐요. 헷갈리면 📖수첩의 단서에 적힌 연도를 살펴봐요!' },
+      { who: 'pili', text: '이제 찢어진 기록을 붙일 차례예요. 이번엔 연도가 지워져 있어요!' },
+      { who: 'pili', text: "'무엇 때문에 무엇이 일어났는지'를 떠올리면 순서가 보여요." },
     ],
     hints: [
-      '원인이 먼저, 결과가 나중이에요. 담판을 해야 성을 쌓을 수 있겠죠? 수첩의 단서 카드에도 연도가 적혀 있어요.',
-      '다른 조각도 수첩의 연도를 보며 맞춰 봐요.',
+      '원인이 먼저, 결과가 나중이에요. 담판이 있어야 성을 쌓을 수 있고, 성이 있어야 돌려 달라고 할 수 있겠죠?',
+      '조정에서 받은 급보와 서희의 담판, 어느 쪽이 먼저였을까요?',
     ],
     success: [{ who: 'pili', text: '순서가 딱 맞았어요! 이제 사건들이 왜 이어졌는지 실로 묶어 봐요.' }],
   };
@@ -262,10 +452,11 @@
     text: '왼쪽의 원인과 오른쪽의 결과를 이어요. 모두 이으면 기록이 완성돼요.',
     pairs: [
       { cause: '거란이 발해를 멸망시켰어요', effect: '고려가 거란을 경계했어요', explain: '발해를 무너뜨린 거란을 고려는 믿지 않고 경계했어요.' },
-      { cause: '서희가 거란이 정말 바라는 것을 알아챘어요', effect: '싸우지 않고 강동 6주를 얻었어요', explain: '거란은 고려가 송과 가까이 지내는 것을 막고 싶어 했어요. 서희는 이 점을 이용해 협상했어요.' },
+      { cause: '거란군이 안융진에서 막혔어요', effect: '거란이 싸움 대신 협상을 요구했어요', explain: '거란군은 더 내려오지 않고 글을 보내 협상을 요구했어요.' },
+      { cause: '서희가 거란이 진짜 바라는 것을 알아챘어요', effect: '싸우지 않고 강동 6주를 얻었어요', explain: '거란은 고려가 송 대신 자기와 교류하길 바랐고, 서희는 이 점을 이용해 협상했어요.' },
       { cause: '고려가 강동 6주를 돌려주지 않았어요', effect: '거란이 1018년에 다시 쳐들어왔어요', explain: '거란은 강동 6주를 돌려 달라고 했지만 고려는 거절했어요.' },
       { cause: '강감찬이 귀주에서 크게 이겼어요', effect: '거란이 더는 크게 쳐들어오지 못했어요', explain: '귀주대첩 뒤 고려와 거란은 화해했고, 오랫동안 평화가 이어졌어요.' },
-      { cause: '거란의 침입을 여러 번 겪었어요', effect: '침입에 대비해 나성과 천리장성을 쌓았어요', explain: '고려는 개경을 둘러싼 나성과, 북쪽 국경을 따라 천리장성을 쌓았어요.' },
+      { cause: '거란의 침입을 여러 번 겪었어요', effect: '나성과 천리장성을 쌓아 대비했어요', explain: '고려는 개경을 둘러싼 나성과, 북쪽 국경을 따라 천리장성을 쌓았어요.' },
     ],
     intro: [{ who: 'pili', text: "역사는 '왜?'와 '그래서'로 이어져 있어요. 원인과 결과를 실로 이어 볼까요?" }],
     hints: ["오른쪽 결과를 하나 골라 '이 일은 왜 일어났을까?' 하고 거꾸로 생각해 봐요."],
@@ -273,28 +464,42 @@
   };
 
   /* ---------- 진행 흐름 ---------- */
-  const COURT_KEYS = ['claims', 'name', 'jurchen', 'balhae'];
-  const CAMP_KEYS = ['invasion2', 'demand'];
+  const COURT_KEYS = ['claimLand', 'claimSong', 'nameGoryeo', 'seogyeong', 'jurchen', 'anyung', 'balhae'];
+  const CAMP_KEYS = ['invasion2', 'demand', 'scout'];
   const count = (g, keys) => keys.filter((k) => g.has(k)).length;
+  const insightCount = (g, ids) => ids.filter((k) => g.has(k)).length;
+
+  async function debateStep(g) {
+    const r = await g.puzzle('debate', debate);
+    if (r === 'withdraw') {
+      await g.say([{ who: 'pili', text: '조정으로 돌아왔어요. 더 조사하고, 📖추론판에서 단서를 이어 본 뒤 서희에게 다시 말을 걸어요.' }]);
+      return;
+    }
+    g.setFlag('debateDone');
+    await mapStep(g);
+  }
 
   async function mapStep(g) {
     await g.puzzle('mapPlace', mapCfg);
     g.setFlag('mapDone');
     await g.addClue('gangdong');
     await g.say([
-      { who: 'pili', text: '그런데 거란은 강동 6주를 내준 것을 곧 아까워했대요…' },
-      { who: 'pili', text: '시간을 건너 25년 뒤, 1018년으로 가 봐요!' },
+      { who: 'pili', text: '그 뒤로 고려와 거란 사이에는 어떤 일이 있었을까요?' },
+      { who: 'pili', text: '시간을 건너 25년 뒤로 가 봐요!' },
     ]);
     await g.goto('camp');
   }
 
-  async function guijuStep(g) {
-    await g.say([
-      { who: 'pili', text: '흥화진에서 피해를 입었지만, 소배압은 개경을 노리고 남쪽으로 계속 내려갔어요.' },
-      { who: 'pili', text: '하지만 고려가 개경을 굳게 지키자, 거란군은 어쩔 수 없이 되돌아가기 시작했어요.' },
-      { who: 'pili', text: '강감찬은 돌아가는 거란군을 귀주에서 기다렸어요. 1019년 2월이에요!' },
-    ]);
-    await g.puzzle('signal', guijuCfg);
+  async function planStep(g) {
+    await g.puzzle('battlePlan', planCfg);
+    g.removeItem('damKit');
+    g.setFlag('damDone');
+    await g.addClue('heunghwa');
+    await campaignStep(g);
+  }
+
+  async function campaignStep(g) {
+    await g.puzzle('campaign', campaignCfg);
     g.setFlag('guijuDone');
     await g.addClue('guiju');
     await g.say([{ who: 'pili', text: '이제 모은 단서로 찢어진 기록을 복원하러 가요!' }]);
@@ -319,125 +524,123 @@
     title: '고려의 사라진 기록 — 거란의 침입',
     points: [
       { year: '926년', text: '거란이 발해를 멸망시켰어요. 고려는 거란을 경계했어요.' },
-      { year: '993년', text: '거란의 1차 침입. 서희가 소손녕과 담판을 벌여 싸우지 않고 거란군을 돌려보냈어요.' },
+      { year: '993년', text: '거란의 1차 침입. 안융진에서 막힌 거란이 협상을 요구했고, 서희가 소손녕과 담판을 벌여 싸우지 않고 거란군을 돌려보냈어요.' },
       { year: '994년~', text: '고려가 압록강 동쪽의 여진을 몰아내고 강동 6주를 쌓았어요.' },
       { year: '1010년', text: '거란의 2차 침입. 개경이 함락되었지만 고려는 끝까지 맞섰어요.' },
-      { year: '1018년', text: '거란의 3차 침입. 강감찬이 흥화진에서 냇물을 이용해 거란군을 공격했어요.' },
-      { year: '1019년', text: '강감찬이 귀주에서 거란군을 크게 물리쳤어요(귀주대첩).' },
+      { year: '1018년', text: '거란이 강동 6주를 돌려 달라 했다가 거절당하자 3차로 침입했어요. 강감찬이 흥화진에서 냇물을 이용해 거란군을 공격했어요.' },
+      { year: '1019년', text: '강감찬이 돌아가던 거란군을 귀주에서 크게 물리쳤어요(귀주대첩).' },
       { year: '그 뒤', text: '고려는 개경에 나성, 북쪽 국경에 천리장성을 쌓아 대비했어요. 고려·송·거란 사이에 평화가 이어졌어요.' },
     ],
-    keyIdea: '서희는 말(외교)로, 강감찬은 지혜로운 작전으로 나라를 지켰어요.',
-    think: ['서희가 싸우지 않고도 땅을 얻을 수 있었던 까닭은 무엇일까요?', '1차 침입과 3차 침입은 서로 어떻게 이어져 있을까요?'],
+    keyIdea: '서희는 상대의 속셈을 읽은 외교로, 강감찬은 지형과 때를 살핀 작전으로 나라를 지켰어요. 그리고 서희가 얻은 강동 6주는 25년 뒤 귀주대첩의 무대가 되었어요.',
+    think: ['서희가 싸우지 않고도 땅을 얻을 수 있었던 까닭은 무엇일까요?', '1차 침입의 결과가 3차 침입과 어떻게 이어졌을까요?'],
     fiction: [
-      '필이, 병사 바우, 근심 많은 관리는 게임에서 만든 인물이에요.',
-      '시간의 서고, 정찰 보고서, 궁궐의 고양이와 깃발 장식은 게임 속 설정이에요.',
+      '필이, 병사 바우, 근심 많은 관리, 전령은 게임에서 만든 인물이에요.',
+      '시간의 서고, 정찰 보고서와 정찰병, 담판 중 태도 게이지는 게임 속 설정이에요.',
       '서희·소손녕·강감찬의 대사는 역사 기록을 바탕으로 쉽게 다시 쓴 창작 대사예요.',
-      '지도는 단순하게 그렸고, 성의 위치는 대략적이에요.',
-      '냇물 작전·깃발 신호 퍼즐의 진행 방식은 게임을 위해 만든 것이에요.',
+      '지도는 단순하게 그렸고, 성·여울·숲의 위치는 대략적이거나 게임을 위해 만든 것이에요.',
+      '작전도의 자리 고르기, 정보 카드, 바람을 보고 공격할 때를 고르는 판단은 게임을 위해 만든 장치예요.',
     ],
   };
 
   /* ---------- 장면 ---------- */
+  const say1 = (g, who, text) => g.say([{ who, text }]);
   const scenes = {
     court: {
       id: 'court',
       caption: { year: '993년', place: '고려 조정' },
       bg: ART.court,
-      objective: (g) =>
-        count(g, COURT_KEYS) < 4 ? `서희를 도울 단서 찾기 (${count(g, COURT_KEYS)}/4)` : '서희에게 말을 걸어 담판을 떠나요',
-      hint: (g) => {
+      objective: (g) => {
+        if (!g.has('claimLand') || !g.has('claimSong')) return `거란이 무엇을 따지는지 알아내요 (${count(g, ['claimLand', 'claimSong'])}/2)`;
         const n = count(g, COURT_KEYS);
-        if (n >= 4) return '단서를 모두 모았어요! 파란 옷을 입은 서희를 눌러 보세요.';
-        if (!g.has('claims')) return '왼쪽 탁자 위 두루마리를 살펴봐요. 거란이 무엇을 주장하는지 알 수 있어요.';
-        if (!g.has('jurchen')) return '가운데 탁자 위의 지도를 살펴봐요.';
-        if (!g.has('name')) return '오른쪽 벽에 걸린 붉은 깃발을 살펴봐요.';
-        return '오른쪽 아래 책 더미를 살펴봐요.';
+        const k = insightCount(g, ['heir', 'route', 'aim']);
+        if (g.flag('debateStage')) return `조사를 더 하고 서희와 담판으로 돌아가요 · 단서 ${n}/7 · 추론 ${k}/3`;
+        return `서희의 근거 모으기 · 단서 ${n}/7 · 추론 ${k}/3 · 준비되면 서희에게`;
+      },
+      hint: (g) => {
+        if (!g.has('claimLand')) return ['거란 장수가 무엇을 주장하는지부터 알아야 해요. 방 안에 거란 진영 소식이 있을까요?', '왼쪽 탁자 위의 두루마리를 살펴봐요.'];
+        if (!g.has('claimSong')) return ['거란의 불만이 하나 더 있대요. 조정 사람에게 물어볼까요?', '초록 옷의 관리에게 말을 걸어 봐요.'];
+        const missing = COURT_KEYS.filter((k) => !g.has(k));
+        if (missing.length)
+          return ['방에는 아직 살펴보지 않은 곳이 있어요. 사람에게 말을 걸고, 물건을 조사해 봐요.',
+            { nameGoryeo: '오른쪽 벽의 붉은 깃발을 살펴봐요.', seogyeong: '서희에게 말을 걸어 봐요.', jurchen: '가운데 탁자 위 지도를 살펴봐요.', anyung: '문 앞에 막 도착한 전령이 있어요.', balhae: '오른쪽 아래 책 더미를 살펴봐요.' }[missing[0]]];
+        if (!g.has('heir') || !g.has('route') || !g.has('aim'))
+          return ['단서 하나만으로는 소손녕을 설득하기 어려워요. 📖수첩의 추론판에서 단서 두 개를 이어 봐요.',
+            !g.has('heir') ? "'나라 이름'과 어울리는 단서는? 고구려와 관계있는 것을 찾아봐요." : !g.has('route') ? "'압록강 가의 여진'은 소손녕의 어떤 주장과 이어질까요?" : "'안융진의 급보'와 소손녕의 둘째 주장을 함께 생각해 봐요. 거란은 왜 더 내려오지 않을까요?"];
+        return '준비가 다 됐어요! 파란 옷의 서희에게 말을 걸어 담판을 시작해요.';
       },
       onEnter: async (g, first) => {
         if (g.flag('debateDone') && !g.flag('mapDone')) return mapStep(g);
         if (first)
           await g.say([
-            { who: 'official', text: '큰일이오! 거란 장수 소손녕이 대군을 이끌고 쳐들어왔소!' },
-            { who: 'official', text: '어떤 신하들은 서경 북쪽 땅을 떼어 주고 화해하자고까지 하오…' },
-            { who: 'seohui', text: '땅을 내주는 것은 안 될 말이오. 내가 적진에 가서 소손녕과 담판을 짓겠소.' },
-            { who: 'pili', text: "'담판'은 서로 만나 따지고 의논해서 일을 결정하는 거예요." },
-            { who: 'pili', text: '서희가 말로 이길 수 있도록, 이 방에서 단서 4개를 찾아 줘요! 반짝이는(✦) 곳을 눌러 봐요.' },
+            { who: 'official', text: '큰일이오! 거란 장수 소손녕이 대군을 이끌고 쳐들어와 항복하라 하오!' },
+            { who: 'seohui', text: '내가 소손녕을 만나 담판을 짓겠소. 그 전에 저들의 주장과 우리의 근거를 알아야 하오.' },
+            { who: 'pili', text: "단서는 조각조각이에요. 모은 단서는 📖수첩 '추론판'에서 둘씩 이어 결론을 만들 수 있어요!" },
           ]);
       },
       hotspots: [
         {
           id: 'report', label: '탁자 위 두루마리', x: 30, y: 470, w: 180, h: 130, art: ART.reportTable,
           onClick: async (g) => {
-            if (g.has('claims')) return g.say([{ who: 'pili', text: '소손녕의 두 가지 주장이 적혀 있어요. 수첩에서 다시 볼 수 있어요.' }]);
-            await g.say([
-              { who: 'pili', text: '거란 진영을 살피고 온 정찰병의 보고서예요. (이 보고서는 게임 속 설정이에요.)' },
-              { who: 'pili', text: "'소손녕은 이렇게 따질 것입니다. 첫째, 고구려의 옛 땅은 거란의 것이다!'" },
-              { who: 'pili', text: "'둘째, 고려는 왜 이웃한 거란을 두고 바다 건너 송나라와만 사귀는가!'" },
-            ]);
-            await g.addClue('claims');
-            await g.say([{ who: 'pili', text: '이 두 주장을 반박할 단서가 필요해요!' }]);
+            if (g.has('claimLand')) return say1(g, 'pili', '정찰 보고서예요. 소손녕의 첫째 주장이 적혀 있어요.');
+            await say1(g, 'pili', '거란 진영을 살피고 온 정찰 보고서예요. (보고서는 게임 속 설정, 주장은 실제 기록이에요)');
+            await g.addClue('claimLand');
           },
         },
         {
           id: 'seohui', label: '서희', x: 240, y: 280, w: 150, h: 245, art: () => fig(looks.seohui),
           onClick: async (g) => {
-            const n = count(g, COURT_KEYS);
-            if (n < 4)
-              return g.say([
-                { who: 'seohui', text: '소손녕은 말솜씨가 대단하다 하오. 그를 설득하려면 근거가 더 필요하오.' },
-                { who: 'pili', text: `지금까지 찾은 단서는 ${n}개예요. 방을 더 둘러봐요!` },
+            if (!g.has('seogyeong')) {
+              await g.say([
+                { who: 'seohui', text: '어떤 신하들은 서경 북쪽 땅을 떼어 주자고 하오. 하지만 서경은 그리 쉽게 내줄 곳이 아니오.' },
+                { who: 'seohui', text: '평양, 곧 서경은 옛 고구려의 도읍이었소. 우리 고려가 무척 아끼는 곳이오.' },
               ]);
-            await g.say([
-              { who: 'seohui', text: '단서를 모두 모았구려. 이제 소손녕을 만나러 가겠소!' },
-              { who: 'pili', text: '기록자님, 담판에서는 소손녕의 말에 맞는 단서 카드를 내밀어 서희를 도와요.' },
-            ]);
-            await g.puzzle('debate', Object.assign({ caption: { year: '993년', place: '거란 진영' } }, debate));
-            g.setFlag('debateDone');
-            await mapStep(g);
+              return g.addClue('seogyeong');
+            }
+            if (!g.has('claimLand') || !g.has('claimSong'))
+              return say1(g, 'seohui', '먼저 거란이 무엇을 따지는지 알아 오시오. 상대의 주장을 알아야 맞설 수 있소.');
+            const k = insightCount(g, ['heir', 'route', 'aim']);
+            await say1(g, 'seohui', k < 2 ? '근거가 아직 부족해 보이지만… 직접 부딪쳐 보는 것도 방법이오. 가 보겠소?' : '근거가 꽤 모였구려. 소손녕을 만나러 갑시다!');
+            await debateStep(g);
+          },
+        },
+        {
+          id: 'messenger', label: '전령', x: 600, y: 300, w: 120, h: 196, art: () => fig(looks.messenger),
+          onClick: async (g) => {
+            if (g.has('anyung')) return say1(g, 'messenger', '거란군은 여전히 그 자리에서 글만 보내고 있습니다!');
+            await g.say([{ who: 'messenger', text: '급보요! 급보! 안융진 소식입니다!' }]);
+            await g.addClue('anyung');
           },
         },
         {
           id: 'map', label: '탁자 위 지도', x: 470, y: 480, w: 280, h: 140, art: ART.mapTable,
           onClick: async (g) => {
             await g.showPicture(`<svg viewBox="0 0 800 640" xmlns="http://www.w3.org/2000/svg">${ART.mapBase()}</svg>`, '고려 북쪽 지도 (단순하게 그린 지도)');
-            if (g.has('jurchen')) return g.say([{ who: 'pili', text: '압록강 주변의 여진이 길을 막고 있었지요.' }]);
-            await g.say([
-              { who: 'pili', text: "지도의 압록강 근처에 '여진'이라고 적혀 있어요." },
-              { who: 'pili', text: '여진이 사는 땅이 고려와 거란 사이를 가로막고 있네요!' },
-            ]);
-            await g.addClue('jurchen');
+            if (!g.has('jurchen')) await g.addClue('jurchen');
           },
         },
         {
           id: 'official', label: '근심 많은 관리', x: 790, y: 290, w: 150, h: 245, art: () => fig(looks.official),
           onClick: async (g) => {
-            if (count(g, COURT_KEYS) >= 4) return g.say([{ who: 'official', text: '서희 공이 기다리고 계시오. 어서 가 보시오!' }]);
+            if (g.has('claimSong')) return say1(g, 'official', '거란이 송나라 이야기를 할 때면 얼굴이 붉어진다더군요.');
             await g.say([
-              { who: 'official', text: '거란이 왜 쳐들어왔는지 아시오? 그들이 무엇을 바라는지부터 알아야 하오.' },
-              { who: 'official', text: '저 탁자 위에 정찰병이 가져온 보고서가 있소. 그리고 지도와 옛 기록도 살펴보시오.' },
+              { who: 'official', text: '거란 사신이 오갈 때마다 하는 불평이 있소.' },
+              { who: 'official', text: "'고려는 이웃한 거란을 두고 바다 건너 송나라와만 사귄다!' 하고 말이오." },
             ]);
+            await g.addClue('claimSong');
           },
         },
         {
           id: 'banner', label: '붉은 깃발', x: 990, y: 120, w: 100, h: 260, art: ART.banner,
           onClick: async (g) => {
-            if (g.has('name')) return g.say([{ who: 'pili', text: "'고려'라는 이름에는 고구려를 잇는다는 뜻이 있어요." }]);
-            await g.say([
-              { who: 'pili', text: "'高麗(고려)'라고 쓰여 있어요. (이 깃발은 게임 속 장식이에요.)" },
-              { who: 'pili', text: "그런데 '고려'라는 이름, 어디서 들어 본 것 같지 않나요? 바로 '고구려'예요!" },
-              { who: 'pili', text: '고려라는 나라 이름에는 고구려를 이어받았다는 뜻이 담겨 있대요.' },
-            ]);
-            await g.addClue('name');
+            if (g.has('nameGoryeo')) return say1(g, 'pili', "'高麗(고려)'. 이 이름, 무언가와 닮지 않았나요?");
+            await say1(g, 'pili', "'高麗(고려)'라고 쓰여 있어요. (깃발은 게임 속 장식이에요)");
+            await g.addClue('nameGoryeo');
           },
         },
         {
           id: 'books', label: '옛 기록', x: 1000, y: 500, w: 180, h: 140, art: ART.books,
           onClick: async (g) => {
-            if (g.has('balhae')) return g.say([{ who: 'pili', text: '926년 거란이 발해를 멸망시킨 기록이에요.' }]);
-            await g.say([
-              { who: 'pili', text: '옛 기록이에요. 926년, 거란이 발해를 멸망시켰다고 적혀 있어요.' },
-              { who: 'pili', text: '그 뒤로 고려는 거란을 경계했대요. 발해에서 온 사람들도 받아들였고요.' },
-            ]);
+            if (g.has('balhae')) return say1(g, 'pili', '거란이 발해를 멸망시킨 옛 기록이에요.');
             await g.addClue('balhae');
           },
         },
@@ -447,114 +650,125 @@
           onClick: async (g) => {
             g.setFlag('catAwake', !g.flag('catAwake'));
             g.refresh();
-            await g.say([{ who: 'pili', text: g.flag('catAwake') ? '냐옹~ 고양이도 나라 걱정에 잠이 깼나 봐요. (게임 속 장식이에요)' : '다시 잠들었어요. 쉿!' }]);
+            await say1(g, 'pili', '어? 고양이 밑에 구겨진 상소문 한 장이 깔려 있어요!');
+            await g.findSecret('halji');
           },
+        },
+        {
+          id: 'coin', label: '반짝이는 것', x: 860, y: 640, w: 50, h: 40, sparkle: () => false, cls: 'tiny-spot',
+          visible: (g) => !g.st.secrets.includes('coin'),
+          art: () => '<svg viewBox="0 0 50 40"><ellipse cx="25" cy="22" rx="12" ry="7" fill="#c9a14a"/><rect x="22" y="19" width="6" height="5" fill="#7a5a20"/></svg>',
+          onClick: (g) => g.findSecret('coin'),
         },
       ],
     },
 
     camp: {
       id: 'camp',
-      caption: { year: '1018년 겨울', place: '흥화진 근처 고려군 진영' },
+      caption: {
+        year: '1018년 겨울',
+        place: '흥화진 근처 고려군 진영',
+        jump: { gap: '⏳ 25년 뒤', marks: [{ y: '993', t: '서희의 담판' }, { y: '994~', t: '강동 6주' }, { y: '1010', t: '거란의 2차 침입' }, { y: '1018', t: '거란의 3차 침입' }] },
+      },
       bg: ART.camp,
       objective: (g) => {
-        const n = count(g, CAMP_KEYS);
-        if (n < 2) return `진영을 살펴 단서 찾기 (${n}/2)` + (g.hasItem('damKit') ? '' : ' · 쓸 만한 물건 찾기');
-        if (g.hasItem('damKit')) return "'쇠가죽 둑'을 냇물에 써 보세요";
-        if (g.hasItem('cowhide') && g.hasItem('rope')) return '도구 칸에서 두 도구를 합쳐 보세요';
-        return '냇물을 막을 재료 찾기';
+        if (!g.has('why3')) return `거란이 왜 다시 왔는지 밝혀요 · 단서 ${count(g, CAMP_KEYS)}/3 · 추론 ${g.has('why3') ? 1 : 0}/1`;
+        if (!g.hasItem('damKit')) return g.hasItem('cowhide') && g.hasItem('rope') ? '두 도구를 합쳐 보세요' : '냇물을 막을 재료를 찾아요';
+        return "'쇠가죽 둑'을 냇물에 쓰고 작전을 짜요";
       },
       hint: (g) => {
-        if (!g.has('invasion2')) return '오른쪽 창을 든 병사에게 말을 걸어 봐요.';
-        if (!g.has('demand')) return '강감찬 옆 나무 받침대 위의 글을 살펴봐요.';
+        const missing = CAMP_KEYS.filter((k) => !g.has(k));
+        if (missing.length)
+          return ['진영 사람들의 이야기와 물건을 살펴봐요.', { invasion2: '오른쪽 창을 든 병사에게 말을 걸어 봐요.', demand: '깃발 옆 나무 받침대의 글을 살펴봐요.', scout: '강감찬에게 말을 걸어 봐요.' }[missing[0]]];
+        if (!g.has('why3')) return ["'거란이 보낸 글'의 번진 글자는 무엇일까요? 25년 전에 얻은 것과 관계있어요.", "추론판에서 '거란이 보낸 글'과 '강동 6주'를 이어 봐요."];
         if (!g.hasItem('damKit')) {
-          if (!g.hasItem('cowhide')) return '왼쪽 아래 갈색 가죽 더미를 살펴봐요.';
-          if (!g.hasItem('rope')) return '가죽 더미 옆의 밧줄을 살펴봐요.';
-          return "화면 아래 도구 칸에서 '쇠가죽'을 누르고, 이어서 '굵은 밧줄'을 눌러 합쳐 봐요.";
+          if (!g.hasItem('cowhide') || !g.hasItem('rope')) return ['물을 막으려면 단단한 재료와 묶을 것이 필요해요.', '왼쪽 아래 가죽 더미와 밧줄을 살펴봐요.'];
+          return "도구 칸에서 '쇠가죽'을 누르고, 이어서 '굵은 밧줄'을 눌러 합쳐 봐요.";
         }
-        return "도구 칸의 '쇠가죽 둑'을 누른 다음, 파란 냇물을 눌러요. (끌어다 놓아도 돼요)";
+        return ['만든 도구를 어디에 쓸까요?', "도구 칸의 '쇠가죽 둑'을 누른 다음, 파란 냇물을 눌러요."];
       },
       onEnter: async (g, first) => {
-        if (g.flag('damDone') && !g.flag('guijuDone')) return guijuStep(g);
+        if (g.flag('damDone') && !g.flag('guijuDone')) return campaignStep(g);
         if (first)
           await g.say([
-            { who: 'gang', text: '거란 장수 소배압이 10만 군사를 이끌고 압록강을 건너왔소!' },
-            { who: 'gang', text: '나는 고려군을 이끄는 강감찬이오. 흥화진 앞에서 적을 막아야 하오.' },
-            { who: 'pili', text: '강감찬은 이때 일흔 살쯤이었대요! 진영을 둘러보며 단서와 쓸 만한 물건을 찾아봐요.' },
+            { who: 'gang', text: '거란 장수 소배압이 10만 군사를 이끌고 압록강을 건너왔소! 나는 고려군을 이끄는 강감찬이오.' },
+            { who: 'gang', text: '그런데 거란은 왜 또 쳐들어온 것이오? 그 까닭부터 밝혀 주시오.' },
           ]);
       },
       hotspots: [
         {
           id: 'cowhide', label: '가죽 더미', x: 50, y: 470, w: 170, h: 140, art: ART.cowhides,
           visible: (g) => !g.hasItem('cowhide') && !g.hasItem('damKit') && !g.flag('damDone'),
-          onClick: async (g) => {
-            await g.say([{ who: 'pili', text: '쇠가죽(소의 가죽)이 잔뜩 쌓여 있어요. 단단하고 물이 잘 새지 않아요.' }]);
-            await g.addItem('cowhide');
-            if (g.hasItem('rope')) await g.say([{ who: 'pili', text: '두 도구를 합쳐 볼까요? 아래 도구 칸에서 하나를 누르고, 다른 하나를 눌러 보세요.' }]);
-          },
+          onClick: (g) => g.addItem('cowhide'),
         },
         {
           id: 'rope', label: '밧줄', x: 240, y: 570, w: 120, h: 110, art: ART.rope,
           visible: (g) => !g.hasItem('rope') && !g.hasItem('damKit') && !g.flag('damDone'),
+          onClick: (g) => g.addItem('rope'),
+        },
+        {
+          id: 'tent', label: '천막', x: 230, y: 310, w: 170, h: 110, sparkle: () => false, cls: 'area secret',
           onClick: async (g) => {
-            await g.say([{ who: 'pili', text: '굵은 밧줄이에요. 무언가를 줄줄이 꿸 수 있겠어요.' }]);
-            await g.addItem('rope');
-            if (g.hasItem('cowhide')) await g.say([{ who: 'pili', text: '두 도구를 합쳐 볼까요? 아래 도구 칸에서 하나를 누르고, 다른 하나를 눌러 보세요.' }]);
+            await say1(g, 'bau', '장군님은 별이 떨어진 날 태어나셨다는 이야기가 있어요!');
+            await g.findSecret('nakseong');
           },
         },
         {
           id: 'gang', label: '강감찬', x: 390, y: 260, w: 150, h: 245, art: () => fig(looks.gang),
           onClick: async (g) => {
-            if (count(g, CAMP_KEYS) < 2)
-              return g.say([{ who: 'gang', text: '적이 왜 다시 쳐들어왔는지 알아야 싸울 수 있소. 진영을 둘러보시오.' }]);
-            if (!g.hasItem('damKit'))
-              return g.say([{ who: 'gang', text: '흥화진 앞 냇물을 이용할 생각이오. 물을 막을 단단한 것을 만들어 주시오.' }]);
-            await g.say([{ who: 'gang', text: "좋소! 그 '쇠가죽 둑'을 냇물에 써 보시오." }]);
+            if (!g.has('scout')) {
+              await say1(g, 'gang', '정찰병이 적의 길을 알아 왔소. 이걸 보시오.');
+              await g.addClue('scout');
+              return;
+            }
+            if (!g.has('why3')) return say1(g, 'gang', '거란이 왜 다시 왔는지 밝혀 주시오. 단서를 이어 보면 보일 것이오.');
+            if (!g.flag('toldWhy')) {
+              g.setFlag('toldWhy');
+              await g.say([
+                { who: 'gang', text: '그렇군. 서희 공이 얻은 강동 6주를 거란이 탐내는 것이오. 흥화진도 바로 그 6주의 성이오!' },
+                { who: 'gang', text: '반드시 지켜야 하오. 흥화진 앞 냇물을 이용할 방법이 있소. 물을 막을 것을 만들어 주시오.' },
+              ]);
+              return;
+            }
+            await say1(g, 'gang', g.hasItem('damKit') ? "그 '쇠가죽 둑'을 냇물에 써 보시오." : '물을 막을 단단한 것을 만들어 주시오.');
           },
         },
         {
           id: 'letter', label: '받침대 위의 글', x: 570, y: 380, w: 120, h: 130, art: ART.letterStand,
           onClick: async (g) => {
-            if (g.has('demand')) return g.say([{ who: 'pili', text: '거란은 강동 6주를 돌려 달라고 했어요. 고려는 거절했고요.' }]);
-            await g.say([
-              { who: 'pili', text: '거란이 보낸 요구가 적혀 있어요. (글의 모습은 게임 속 장치지만, 요구 내용은 실제 기록에 있어요.)' },
-              { who: 'pili', text: "'고려 임금은 직접 와서 예를 갖추고, 강동 6주를 돌려 달라!'" },
-              { who: 'pili', text: '고려가 이것을 거절하자, 거란이 세 번째로 쳐들어온 거예요!' },
-            ]);
+            if (g.has('demand')) return say1(g, 'pili', '번진 글자 "○○ 6주"… 어디서 들어 본 것 같지 않나요?');
+            await say1(g, 'pili', '거란이 보낸 글이에요. 그런데 글자 일부가 번져 있어요!');
             await g.addClue('demand');
           },
         },
         {
           id: 'stream', label: '냇물', x: 760, y: 480, w: 250, h: 230, cls: 'area',
           onClick: async (g) => {
-            await g.say([{ who: 'pili', text: '흥화진 앞을 흐르는 냇물이에요. 물살이 꽤 세요.' }]);
-            if (g.hasItem('damKit')) await g.say([{ who: 'pili', text: "아래 도구 칸에서 '쇠가죽 둑'을 누른 다음, 냇물을 다시 눌러 보세요!" }]);
-            else await g.say([{ who: 'pili', text: '무언가로 물을 막을 수 있다면 좋을 텐데…' }]);
+            await say1(g, 'pili', g.hasItem('damKit') ? "아래 도구 칸에서 '쇠가죽 둑'을 누른 다음, 냇물을 다시 눌러 보세요!" : '흥화진 앞을 흐르는 냇물이에요. 물살이 꽤 세요.');
           },
           onItem: {
             damKit: async (g) => {
-              if (count(g, CAMP_KEYS) < 2)
-                return g.say([
-                  { who: 'gang', text: '잠깐! 작전을 펼치기 전에, 적이 왜 다시 쳐들어왔는지부터 알아 두시오.' },
-                  { who: 'pili', text: `진영의 단서를 더 찾아봐요. (${count(g, CAMP_KEYS)}/2)` },
-                ]);
-              await g.puzzle('dam', damCfg);
-              g.removeItem('damKit');
-              g.setFlag('damDone');
-              await g.addClue('heunghwa');
-              await guijuStep(g);
+              if (!g.has('why3') || !g.has('scout'))
+                return g.say([{ who: 'gang', text: '잠깐! 적이 왜 왔는지, 어디로 오는지부터 알아 두시오.' }]);
+              await planStep(g);
             },
-            cowhide: (g) => g.say([{ who: 'pili', text: '쇠가죽만으로는 물살에 떠내려가요. 밧줄과 합쳐 볼까요?' }]),
-            rope: (g) => g.say([{ who: 'pili', text: '밧줄만으로는 물을 막을 수 없어요. 쇠가죽과 합쳐 볼까요?' }]),
+            cowhide: (g) => say1(g, 'pili', '쇠가죽만으로는 물살에 떠내려가요. 무엇과 함께 쓰면 좋을까요?'),
+            rope: (g) => say1(g, 'pili', '밧줄만으로는 물을 막을 수 없어요.'),
+          },
+        },
+        {
+          id: 'gate', label: '흥화진 성문', x: 1050, y: 200, w: 90, h: 80, sparkle: () => false, cls: 'area secret',
+          onClick: async (g) => {
+            await say1(g, 'pili', '성문 옆에 오래된 이름이 새겨져 있어요…');
+            await g.findSecret('yanggyu');
           },
         },
         {
           id: 'bau', label: '병사 바우', x: 1080, y: 330, w: 150, h: 245, art: () => fig(looks.bau),
           onClick: async (g) => {
-            if (g.has('invasion2')) return g.say([{ who: 'bau', text: '강감찬 장군님의 작전이라면 꼭 이길 거예요!' }]);
+            if (g.has('invasion2')) return say1(g, 'bau', '강감찬 장군님의 작전이라면 꼭 이길 거예요!');
             await g.say([
-              { who: 'bau', text: '8년 전, 1010년에도 거란이 쳐들어왔어요. 그때는 거란 임금이 직접 왔대요.' },
-              { who: 'bau', text: '개경이 함락되고, 임금님(현종)께서 멀리 나주까지 피란하셨어요.' },
+              { who: 'bau', text: '8년 전에도 거란이 쳐들어왔어요. 그때는 개경까지 불탔대요.' },
               { who: 'bau', text: '이번엔 꼭 막아야 해요!' },
             ]);
             await g.addClue('invasion2');
@@ -571,24 +785,24 @@
       hint: () => '가운데 빛나는 기록을 눌러 복원을 시작해요.',
       onEnter: (g) => restoreStep(g),
       hotspots: [
-        {
-          id: 'scroll', label: '찢어진 고려의 기록', x: 500, y: 200, w: 280, h: 200, cls: 'area glow',
-          onClick: (g) => restoreStep(g),
-        },
+        { id: 'scroll', label: '찢어진 고려의 기록', x: 500, y: 200, w: 280, h: 200, cls: 'area glow', onClick: (g) => restoreStep(g) },
       ],
     },
   };
 
   HA.episodes['goryeo-khitan'] = {
     id: 'goryeo-khitan',
+    version: 2,
     era: 'goryeo',
     title: '고려의 사라진 기록',
     subtitle: '거란의 침입과 고려의 대응',
-    blurb: '거란이 쳐들어왔어요! 서희의 외교 담판과 강감찬의 귀주대첩까지, 뒤섞인 고려의 기록을 바로잡아요.',
-    minutes: '약 8~12분',
+    blurb: '거란이 쳐들어왔어요! 조각난 단서를 이어 서희의 담판을 성공시키고, 25년 뒤 강감찬의 작전을 세워 뒤섞인 고려의 기록을 바로잡아요.',
+    minutes: '약 15~20분 (구간마다 저장)',
     startScene: 'court',
     characters,
     clues,
+    insights,
+    secrets,
     items,
     recipes,
     scenes,
@@ -597,9 +811,8 @@
     intro: (g) =>
       g.say([
         { who: 'pili', text: '기록자님, 큰일 났어요! 시간의 서고에 있던 고려의 기록이 찢어져 흩어졌어요!' },
-        { who: 'pili', text: "저는 시간의 붓 '필이'예요. 기록자님이 단서를 모아 오면, 찢어진 기록을 다시 붙일 수 있어요." },
-        { who: 'pili', text: '반짝이는(✦) 곳을 눌러 살펴보고, 막히면 오른쪽 위 💡힌트를 눌러요. 모은 단서는 📖수첩에 담겨요.' },
-        { who: 'pili', text: '자, 993년 고려로 가요! 거란이 쳐들어왔다는 소식에 조정이 시끌시끌하대요.' },
+        { who: 'pili', text: "저는 시간의 붓 '필이'예요. 이번 기록은 조각조각 흩어져 있어서, 단서를 서로 이어 봐야 진실이 보여요." },
+        { who: 'pili', text: '막히면 💡힌트를 눌러요. 누를수록 조금씩 더 자세히 알려 줄게요. 자, 993년 고려로 가요!' },
       ]),
   };
 })();

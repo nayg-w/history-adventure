@@ -168,6 +168,7 @@ HA.main = (() => {
         <p class="cp-kicker">기록 복원 완료!</p>
         <h2>${esc(sm.title)}</h2>
         <p class="cp-key">💡 ${esc(sm.keyIdea)}</p>
+        ${stats(ep, HA.store.ep(id))}
         <div class="cp-cols">
           <section class="cp-real">
             <h3>📜 실제 역사 한눈에 보기</h3>
@@ -196,6 +197,18 @@ HA.main = (() => {
       eras: showEras,
     });
     root.querySelector('.btn.primary').focus({ preventScroll: true });
+  }
+
+  /** 탐험 기록: 추론·숨은 기록·힌트 사용·메달 (점수 경쟁이 아닌 성취 표시) */
+  function stats(ep, st) {
+    const ins = Object.keys(ep.insights || {});
+    const sec = Object.keys(ep.secrets || {});
+    const items = [];
+    if (ins.length) items.push(`🧩 추론 <b>${ins.filter((i) => st.clues.includes(i)).length}/${ins.length}</b>`);
+    if (sec.length) items.push(`✨ 숨은 기록 <b>${(st.secrets || []).length}/${sec.length}</b>`);
+    items.push(`💡 힌트 <b>${(st.stats && st.stats.hints) || 0}</b>번`);
+    if (st.flags && st.flags.medal_debateStage) items.push('🏅 <b>명협상가</b> (힌트 없이, 결렬 없이 담판 성공)');
+    return `<p class="cp-stats">${items.join(' · ')}</p>`;
   }
 
   /* ---------- 연대표 ---------- */
