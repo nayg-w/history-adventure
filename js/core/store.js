@@ -16,6 +16,9 @@ HA.store = (() => {
       flags: {},
       seen: [],
       met: [],
+      secrets: [],
+      stats: { hints: 0 },
+      contentVersion: 0,
       newClues: 0,
       // 한 번 복원한 기록은 다시 플레이해도 연대표에 남는다
       restored: prev ? !!prev.restored : false,

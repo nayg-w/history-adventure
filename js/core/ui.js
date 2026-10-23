@@ -104,13 +104,31 @@ HA.ui = (() => {
     const t = $('toast');
     const card = h(`
       <div class="gain-card ${kind}">
-        <div class="gain-label">${kind === 'item' ? '새 도구!' : '새 단서 발견!'}</div>
+        <div class="gain-label">${{ item: '새 도구!', insight: '추론 성공! 새 결론', secret: '숨은 기록 발견!' }[kind] || '새 단서 발견!'}</div>
         <div class="gain-icon">${obj.icon || '📜'}</div>
         <div class="gain-title">${esc(obj.title)}</div>
+        ${obj.text && kind !== 'insight' ? `<p class="gain-text">${esc(obj.text)}</p><small class="gain-more">눌러서 계속 ▶</small>` : ''}
       </div>`);
     t.appendChild(card);
-    HA.audio.play(kind === 'item' ? 'item' : 'clue');
-    await sleep(1300);
+    HA.audio.play(kind === 'item' ? 'item' : kind === 'insight' ? 'win' : 'clue');
+    if (obj.text && kind !== 'insight') {
+      // 단서 내용을 읽을 시간: 누르면 바로 넘어간다
+      t.classList.add('wait');
+      await new Promise((res) => {
+        const done = () => {
+          clearTimeout(tm);
+          t.removeEventListener('click', done);
+          document.removeEventListener('keydown', done, true);
+          res();
+        };
+        const tm = setTimeout(done, 9000);
+        setTimeout(() => {
+          t.addEventListener('click', done);
+          document.addEventListener('keydown', done, true);
+        }, 300);
+      });
+      t.classList.remove('wait');
+    } else await sleep(1300);
     card.classList.add('fly');
     await sleep(550);
     card.remove();
@@ -185,11 +203,16 @@ HA.ui = (() => {
   /* ---------- 화면 전환 ---------- */
   ui.fade = async function (fn, caption) {
     const f = $('fader');
-    f.innerHTML = caption ? `<div class="fade-cap"><small>${esc(caption.year || '')}</small><b>${esc(caption.place || '')}</b></div>` : '';
+    const j = caption && caption.jump;
+    f.innerHTML = caption
+      ? `<div class="fade-cap">${j ? `<div class="jump"><em>${esc(j.gap)}</em><ol>${j.marks
+            .map((m, i) => `<li class="${i === j.marks.length - 1 ? 'now' : ''}" style="--d:${i * 0.35}s"><b>${esc(m.y)}</b><span>${esc(m.t)}</span></li>`)
+            .join('')}</ol></div>` : ''}<small>${esc(caption.year || '')}</small><b>${esc(caption.place || '')}</b></div>`
+      : '';
     f.classList.add('on');
     await sleep(450);
     await fn();
-    await sleep(caption ? 1100 : 150);
+    await sleep(j ? 3000 : caption ? 1100 : 150);
     f.classList.remove('on');
     await sleep(400);
   };
@@ -202,26 +225,38 @@ HA.ui = (() => {
     HA.store.save();
     game.refreshHud && game.refreshHud();
     const total = Object.keys(ep.clues).length;
+    const insights = ep.insights || {};
+    const canDeduce = !!game.addClue && Object.keys(insights).length > 0;
+    const nClues = st.clues.filter((c) => ep.clues[c]).length;
+    const nIns = st.clues.filter((c) => insights[c]).length;
+    const secrets = ep.secrets || {};
     const root = h(`<div class="notebook">
       <div class="nb-tabs" role="tablist">
-        <button role="tab" data-t="clues">단서 <small>${st.clues.length}/${total}</small></button>
+        <button role="tab" data-t="clues">단서 <small>${nClues}/${total}</small></button>
+        ${canDeduce ? `<button role="tab" data-t="deduce">🧩 추론판 <small>${nIns}/${Object.keys(insights).length}</small></button>` : ''}
         <button role="tab" data-t="items">도구 <small>${st.items.length}</small></button>
         <button role="tab" data-t="people">인물</button>
+        ${Object.keys(secrets).length ? `<button role="tab" data-t="secrets">숨은 기록 <small>${(st.secrets || []).length}/${Object.keys(secrets).length}</small></button>` : ''}
       </div>
       <div class="nb-page"></div>
     </div>`);
     const page = root.querySelector('.nb-page');
 
     function kindTag(k) {
-      return k === 'game'
-        ? '<span class="tag fiction">게임 속 설정</span>'
-        : '<span class="tag real">실제 역사</span>';
+      if (k === 'game') return '<span class="tag fiction">게임 속 설정</span>';
+      if (k === 'legend') return '<span class="tag legend">전해지는 이야기</span>';
+      return '<span class="tag real">실제 역사</span>';
     }
     function show(t) {
       root.querySelectorAll('.nb-tabs button').forEach((b) => b.setAttribute('aria-selected', b.dataset.t === t));
       page.innerHTML = '';
       if (t === 'clues') {
         const grid = h('<div class="nb-grid"></div>');
+        st.clues.filter((id) => insights[id]).forEach((id) => {
+          const c = insights[id];
+          grid.appendChild(h(`<article class="nb-card insight"><div class="nb-icon">${c.icon}</div><h4>${esc(c.title)}</h4>
+            <p>${esc(c.text)}</p><span class="tag insight">🧩 추론한 결론</span></article>`));
+        });
         Object.entries(ep.clues).forEach(([id, c]) => {
           const got = st.clues.includes(id);
           grid.appendChild(
@@ -232,6 +267,17 @@ HA.ui = (() => {
                 : `<div class="nb-icon">❔</div><h4>아직 찾지 못한 단서</h4><p>장면을 더 살펴보세요.</p>`}
             </article>`)
           );
+        });
+        page.appendChild(grid);
+      } else if (t === 'deduce') {
+        deduceTab(page, game, () => show('deduce'));
+      } else if (t === 'secrets') {
+        const grid = h('<div class="nb-grid"></div>');
+        Object.entries(secrets).forEach(([id, s]) => {
+          const got = (st.secrets || []).includes(id);
+          grid.appendChild(h(`<article class="nb-card ${got ? '' : 'empty'}"><div class="nb-icon">${got ? '✨' : '❔'}</div>
+            <h4>${got ? esc(s.title) : '아직 못 찾은 숨은 기록'}</h4><p>${got ? esc(s.text) : '장면 속 작은 것들을 눌러 보세요.'}</p>
+            ${got ? kindTag(s.kind) : ''}</article>`));
         });
         page.appendChild(grid);
       } else if (t === 'items') {
@@ -262,6 +308,90 @@ HA.ui = (() => {
     show(tab);
     ui.modal(root, { cls: 'wide' });
   };
+
+  /** 추론판: 단서 두 개를 이어 결론을 끌어낸다. 정답 문장을 바로 보여 주지 않고, 근거를 따져 고르게 한다. */
+  function deduceTab(page, game, rerender) {
+    const ep = game.ep;
+    const st = game.st;
+    const insights = ep.insights || {};
+    const pick = [];
+    const owned = st.clues;
+    page.appendChild(h(`<div class="ded">
+      <p class="ded-intro">단서 두 개를 골라 <b>이어 보기</b>를 눌러요. 둘 사이에 연결고리가 있으면 새로운 결론을 끌어낼 수 있어요.</p>
+      <div class="ded-chips"></div>
+      <div class="ded-bar"><div class="ded-slot" data-s="0">단서 ①</div><span>+</span><div class="ded-slot" data-s="1">단서 ②</div>
+        <button class="btn primary ded-go" disabled>이어 보기</button></div>
+      <div class="ded-result" aria-live="polite"></div>
+    </div>`));
+    const chips = page.querySelector('.ded-chips');
+    const go = page.querySelector('.ded-go');
+    const res = page.querySelector('.ded-result');
+    const slots = page.querySelectorAll('.ded-slot');
+    owned.forEach((id) => {
+      const c = game.info(id);
+      const b = h(`<button class="ded-chip ${insights[id] ? 'ins' : ''}" data-id="${id}"><span>${c.icon}</span>${esc(c.title)}</button>`);
+      b.onclick = () => {
+        HA.audio.play('click');
+        const i = pick.indexOf(id);
+        if (i >= 0) pick.splice(i, 1);
+        else {
+          if (pick.length === 2) pick.shift();
+          pick.push(id);
+        }
+        res.innerHTML = '';
+        sync();
+      };
+      chips.appendChild(b);
+    });
+    function sync() {
+      chips.querySelectorAll('.ded-chip').forEach((b) => b.classList.toggle('sel', pick.includes(b.dataset.id)));
+      slots.forEach((s, i) => {
+        s.textContent = pick[i] ? game.info(pick[i]).title : `단서 ${i ? '②' : '①'}`;
+        s.classList.toggle('full', !!pick[i]);
+      });
+      go.disabled = pick.length < 2;
+    }
+    go.onclick = () => {
+      const [a, b] = pick;
+      const found = Object.entries(insights).find(([, ins]) => ins.from.includes(a) && ins.from.includes(b));
+      if (!found) {
+        HA.audio.play('wrong');
+        const near = Object.entries(insights).some(([iid, ins]) => !owned.includes(iid) && (ins.from.includes(a) || ins.from.includes(b)));
+        res.innerHTML = `<p class="ded-msg bad">${near ? '🤔 이 둘은 바로 이어지지 않아요. 하지만 둘 중 하나는 다른 단서와 짝이 될 것 같아요!' : '🤔 두 단서 사이에 연결고리가 보이지 않아요.'}</p>`;
+        return;
+      }
+      const [iid, ins] = found;
+      if (owned.includes(iid)) {
+        res.innerHTML = `<p class="ded-msg">이미 끌어낸 결론이에요: <b>${esc(ins.title)}</b></p>`;
+        return;
+      }
+      HA.audio.play('good');
+      res.innerHTML = `<div class="ded-q"><p class="ded-msg good">💡 연결고리가 보여요! 두 단서를 함께 보면 무엇을 알 수 있을까요?</p><div class="ded-choices"></div><p class="ded-why"></p></div>`;
+      const box = res.querySelector('.ded-choices');
+      const why = res.querySelector('.ded-why');
+      HA.util.shuffle(ins.choices).forEach((ch) => {
+        const cb = h(`<button class="ded-choice">${esc(ch.text)}</button>`);
+        cb.onclick = async () => {
+          if (ch.correct) {
+            box.querySelectorAll('button').forEach((x) => (x.disabled = true));
+            cb.classList.add('right');
+            why.className = 'ded-why good';
+            why.textContent = ins.text;
+            await game.addClue(iid);
+            setTimeout(rerender, 900);
+          } else {
+            HA.audio.play('wrong');
+            cb.disabled = true;
+            cb.classList.add('wrong');
+            why.className = 'ded-why bad';
+            why.textContent = ch.why;
+          }
+        };
+        box.appendChild(cb);
+      });
+    };
+    sync();
+  }
 
   return ui;
 })();
