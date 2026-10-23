@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="초등학교 5학년을 위한 한국사 탐험 어드벤처 — 시간의 기록자: 사라진 역사" />
+  <meta name="theme-color" content="#14132a" />
+  <title>시간의 기록자 — 사라진 역사</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="stage" aria-label="시간의 기록자 게임 화면">
+    <main id="screen"></main>
+    <div id="hud"></div>
+    <div id="overlay"></div>
+    <div id="dialogue"></div>
+    <div id="modal"></div>
+    <div id="toast" aria-live="polite"></div>
+    <div id="fader"></div>
+  </div>
+  <div id="rotate-hint">📱 화면을 가로로 돌리면 더 크게 볼 수 있어요</div>
+  <noscript>이 게임은 자바스크립트가 켜져 있어야 실행돼요.</noscript>
+
+  <!-- 엔진 -->
+  <script src="js/core/util.js"></script>
+  <script src="js/core/store.js"></script>
+  <script src="js/core/audio.js"></script>
+  <script src="js/core/ui.js"></script>
+  <script src="js/core/engine.js"></script>
+  <!-- 퍼즐 종류 (여러 에피소드에서 다시 쓸 수 있음) -->
+  <script src="js/puzzles/debate.js"></script>
+  <script src="js/puzzles/mapPlace.js"></script>
+  <script src="js/puzzles/dam.js"></script>
+  <script src="js/puzzles/signal.js"></script>
+  <script src="js/puzzles/timeline.js"></script>
+  <script src="js/puzzles/causeLink.js"></script>
+  <script src="js/puzzles/restore.js"></script>
+  <!-- 그림 -->
+  <script src="js/art/art.js"></script>
+  <script src="js/art/goryeo-art.js"></script>
+  <!-- 역사 콘텐츠 데이터 -->
+  <script src="js/data/eras.js"></script>
+  <script src="js/data/episodes/goryeo-khitan.js"></script>
+  <!-- 화면 흐름 -->
+  <script src="js/main.js"></script>
+</body>
+</html>
