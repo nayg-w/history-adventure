@@ -32,16 +32,67 @@ HA.puzzles.campaign = function (cfg, g) {
       </svg><div class="map-targets"></div></div>`;
     }
 
-    /* ---------- A. 예측 ---------- */
+    /* 지도 위 이동 표시: 경로를 따라 말(거란군·고려군)을 옮긴다 */
+    function pathPoint(svgEl, d, f) {
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('d', d);
+      p.style.visibility = 'hidden';
+      svgEl.appendChild(p);
+      const pt = p.getPointAtLength(p.getTotalLength() * f);
+      p.remove();
+      return pt;
+    }
+    function moveMarker(m, pt) {
+      m.style.transform = `translate(${pt.x}px, ${pt.y}px)`;
+    }
+    const marker = (cls, label) => `<g class="mk ${cls}"><circle r="16"/><text y="6" text-anchor="middle">${label}</text></g>`;
+
+    /* ---------- A. 예측: 소식이 하나씩 들어오고, 적이 지도 위에서 움직인다 ---------- */
     function phaseA() {
       const A = cfg.A;
-      root.innerHTML = `${mapView()}
+      let shown = 1;
+      root.innerHTML = `${mapView(`<path class="route trail" d=""/>${marker('enemy', '거')}<g class="whatif"></g>`)}
         <aside class="map-side camp-side">
           <h3>${esc(A.title)}</h3>
           <p class="q">${esc(A.question)}</p>
-          <div class="intel">${A.intel.map((c) => `<article class="intel-card"><span>${c.icon}</span><div><b>${esc(c.title)}</b><p>${esc(c.text)}</p></div></article>`).join('')}</div>
+          <div class="intel"></div>
+          <button class="btn tiny next-news">⏩ 다음 소식 받기</button>
           <div class="opts">${A.options.map((o) => `<button class="db-choice" data-id="${o.id}">${esc(o.text)}</button>`).join('')}</div>
         </aside>`;
+      const svgEl = root.querySelector('.map-svg');
+      const enemyMk = root.querySelector('.mk.enemy');
+      const intelEl = root.querySelector('.intel');
+      const nextBtn = root.querySelector('.next-news');
+      root.querySelector('.route.down').classList.add('ghost');
+      function renderIntel() {
+        intelEl.innerHTML = A.intel
+          .slice(0, shown)
+          .map((c, i) => `<article class="intel-card ${i === shown - 1 ? 'new' : ''}"><span>${c.icon}</span><div><b>${esc(c.title)}</b><p>${esc(c.text)}</p></div></article>`)
+          .join('');
+        const f = A.progress[shown - 1];
+        moveMarker(enemyMk, pathPoint(svgEl, cfg.routeDown, f));
+        root.querySelector('.route.trail').setAttribute('d', cfg.routeDown);
+        root.querySelector('.route.trail').style.strokeDasharray = `${f * 600} 2000`;
+        nextBtn.hidden = shown >= A.intel.length;
+      }
+      nextBtn.onclick = () => {
+        HA.audio.play('page');
+        shown++;
+        renderIntel();
+      };
+      /** '만약에' 장면: 잘못된 예측이 어떻게 될지 지도 위에 짧게 보여 준다 (게임 속 상상) */
+      async function whatIf(o) {
+        const w = root.querySelector('.whatif');
+        const end = pathPoint(svgEl, cfg.routeDown, 1);
+        if (o.id === 'siege') {
+          w.innerHTML = `<g transform="translate(${end.x} ${end.y})"><circle class="siege-ring" r="34"/><text class="food" y="-30" text-anchor="middle">🍚</text></g>`;
+        } else {
+          w.innerHTML = `<path class="cut" d="M${end.x} ${end.y} L${end.x + 60} ${end.y + 50}"/><text x="${end.x + 70}" y="${end.y + 70}" class="food">❓</text>`;
+        }
+        w.innerHTML += `<text x="${end.x - 150}" y="${end.y - 50}" class="whatif-label">만약에… (게임 속 상상)</text>`;
+        await sleep(1300);
+        w.innerHTML = '';
+      }
       root.querySelectorAll('.opts button').forEach((b) => {
         b.onclick = async () => {
           if (HA.ui.isTalking()) return;
@@ -50,51 +101,144 @@ HA.puzzles.campaign = function (cfg, g) {
             HA.audio.play('wrong');
             b.disabled = true;
             b.classList.add('nope');
-            return g.say([{ who: 'gang', text: o.why }]);
+            await whatIf(o);
+            return g.say([{ who: 'gang', text: shown < A.intel.length ? o.why + ' ' + A.moreNews : o.why }]);
           }
           HA.audio.play('good');
+          const early = shown < A.intel.length; // 소식을 다 보기 전에 맞힌 경우
+          shown = A.intel.length;
+          renderIntel();
           root.querySelector('.route.down').classList.add('back');
-          await g.say(A.win);
+          await g.say(early ? [{ who: 'gang', text: A.early }, ...A.win] : A.win);
           setPhase(1);
           phaseB();
         };
       });
+      renderIntel();
     }
 
-    /* ---------- B. 길목 고르기 ---------- */
+    /* ---------- B. 길목 고르기: 고려군 깃발을 지도에 놓으면, 돌아가는 거란군의 움직임으로 결과를 보여 준다 ---------- */
     function phaseB() {
       const B = cfg.B;
-      root.innerHTML = `${mapView(`<path class="route back" d="${cfg.routeBack}"/>`)}
+      root.innerHTML = `${mapView(`<path class="route back" d="${cfg.routeBack}"/>${marker('enemy', '거')}${marker('ally', '고')}<g class="clash"></g>`)}
         <aside class="map-side camp-side">
           <h3>${esc(B.title)}</h3>
           <p class="q">${esc(B.question)}</p>
           <p class="tip">${esc(B.tip)}</p>
+          <button class="army-token">🚩 고려군<small>끌어서 지도에 놓기 (또는 아래 후보 누르기)</small></button>
           <p class="map-fb" aria-live="polite"></p>
         </aside>`;
+      const svgEl = root.querySelector('.map-svg');
+      const enemyMk = root.querySelector('.mk.enemy');
+      const allyMk = root.querySelector('.mk.ally');
       const wrap = root.querySelector('.map-targets');
       const fb = root.querySelector('.map-fb');
-      B.targets.forEach((t) => {
-        const b = h(`<button class="map-target" style="left:${t.x * 0.95}px;top:${t.y * 0.95}px">${esc(t.label)}</button>`);
-        b.onclick = async () => {
-          if (HA.ui.isTalking()) return;
-          if (!t.ok) {
-            HA.audio.play('wrong');
-            fb.className = 'map-fb bad';
-            fb.textContent = t.why;
-            b.classList.add('nope');
-            setTimeout(() => b.classList.remove('nope'), 500);
-            return;
+      const token = root.querySelector('.army-token');
+      let busy = false;
+      allyMk.style.opacity = '0';
+      moveMarker(enemyMk, pathPoint(svgEl, cfg.routeBack, 0));
+      const toMap = (cx, cy) => {
+        const r = svgEl.getBoundingClientRect();
+        return { x: ((cx - r.left) * 800) / r.width, y: ((cy - r.top) * 640) / r.height };
+      };
+      /** 놓은 곳이 어떤 자리인지 판단 */
+      function classify(x, y) {
+        const near = B.targets.map((t) => ({ t, d: Math.hypot(t.x - x, t.y - y) })).sort((a, b) => a.d - b.d)[0];
+        if (near.d < 60) return near.t;
+        if (HA.util.inPoly(x, y, cfg.khitanZone)) return B.targets.find((t) => t.id === 'beyond');
+        // 돌아가는 길 가까이인지
+        for (let f = 0; f <= 1.0001; f += 0.05) {
+          const p = pathPoint(svgEl, cfg.routeBack, f);
+          if (Math.hypot(p.x - x, p.y - y) < 45) return B.onRoute;
+        }
+        return B.offRoute;
+      }
+      async function place(x, y) {
+        if (busy || HA.ui.isTalking()) return;
+        busy = true;
+        const t = classify(x, y);
+        allyMk.style.transition = 'none';
+        moveMarker(allyMk, { x, y });
+        allyMk.style.opacity = '1';
+        HA.audio.play('click');
+        fb.className = 'map-fb';
+        fb.textContent = '거란군이 돌아가기 시작해요…';
+        // 거란군이 돌아가는 길을 따라 움직인다
+        enemyMk.style.transition = 'none';
+        moveMarker(enemyMk, pathPoint(svgEl, cfg.routeBack, 0));
+        void enemyMk.getBoundingClientRect();
+        enemyMk.style.transition = 'transform .18s linear';
+        for (let f = 0.08; f <= (t.ok ? 0.97 : 1.0001); f += 0.08) {
+          moveMarker(enemyMk, pathPoint(svgEl, cfg.routeBack, Math.min(1, f)));
+          await sleep(180);
+        }
+        if (!t.ok) {
+          // 막지 못하면 압록강을 건너 빠져나간다
+          for (let f = 0.25; f <= 1.0001; f += 0.25) {
+            moveMarker(enemyMk, pathPoint(svgEl, cfg.routeEscape, f));
+            await sleep(180);
           }
+        }
+        if (t.ok) {
           HA.audio.play('good');
-          b.classList.add('chosen');
+          root.querySelector('.clash').innerHTML = `<g transform="translate(${x} ${y})"><circle class="clash-ring" r="30"/><text y="8" text-anchor="middle" font-size="28">⚔️</text></g>`;
           fb.className = 'map-fb good';
           fb.textContent = t.why;
-          await sleep(600);
+          await sleep(900);
           await g.say(B.win);
           setPhase(2);
-          phaseC();
-        };
+          return phaseC();
+        }
+        HA.audio.play('wrong');
+        fb.className = 'map-fb bad';
+        fb.textContent = '거란군이 빠져나갔어요! ' + t.why;
+        await sleep(600);
+        enemyMk.style.transition = 'none';
+        moveMarker(enemyMk, pathPoint(svgEl, cfg.routeBack, 0));
+        busy = false;
+      }
+      B.targets.forEach((t) => {
+        const b = h(`<button class="map-target small" style="left:${t.x * 0.95}px;top:${t.y * 0.95}px">${esc(t.label)}</button>`);
+        b.onclick = () => place(t.x, t.y);
         wrap.appendChild(b);
+      });
+      // 끌어다 놓기
+      let start = null;
+      let ghost = null;
+      token.addEventListener('pointerdown', (e) => {
+        start = { x: e.clientX, y: e.clientY };
+        token.setPointerCapture(e.pointerId);
+      });
+      token.addEventListener('pointermove', (e) => {
+        if (!start) return;
+        if (!ghost && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 8) {
+          ghost = h('<div class="drag-ghost">🚩</div>');
+          document.getElementById('stage').appendChild(ghost);
+        }
+        if (ghost) {
+          const p = HA.util.toStage(e.clientX, e.clientY);
+          ghost.style.left = p.x + 'px';
+          ghost.style.top = p.y + 'px';
+        }
+      });
+      token.addEventListener('pointerup', (e) => {
+        if (!start) return;
+        start = null;
+        if (!ghost) {
+          fb.textContent = '깃발을 끌어서 지도 위에 놓아 보세요. 후보 이름을 눌러도 돼요.';
+          return;
+        }
+        ghost.remove();
+        ghost = null;
+        const r = svgEl.getBoundingClientRect();
+        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+        const m = toMap(e.clientX, e.clientY);
+        place(m.x, m.y);
+      });
+      token.addEventListener('pointercancel', () => {
+        start = null;
+        if (ghost) ghost.remove();
+        ghost = null;
       });
     }
 
@@ -105,6 +249,7 @@ HA.puzzles.campaign = function (cfg, g) {
       const riders = (color, flag, pos, f) => pos.map(([x, y]) => `<g transform="translate(${x} ${y}) scale(1.3)">${HA.art.rider(color, flag, f)}</g>`).join('');
       root.innerHTML = `<div class="pz-bg">${C.bg()}</div>
         <div class="windfield" aria-hidden="true">${'<i></i>'.repeat(16)}</div>
+        <div class="rain" aria-hidden="true">${'<i></i>'.repeat(30)}</div>
         <svg class="dam-svg" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
           <g class="enemy-army">${riders('#6b3f22', '#d9c3a0', [[300, 200], [380, 220], [460, 200], [540, 220], [620, 200], [340, 260], [500, 262], [580, 258]], -1)}</g>
           <g class="ally-army">${riders('#2f5d8a', '#b8352a', [[320, 520], [400, 540], [480, 520], [560, 540], [640, 520]], 1)}</g>

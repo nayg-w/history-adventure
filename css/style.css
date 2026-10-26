@@ -15,6 +15,7 @@
   --serif: 'Nanum Myeongjo', 'Noto Serif KR', 'AppleMyungjo', 'Batang', serif;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; height: 100%; background: #0d0c1a; overflow: hidden; }
 body {
   font-family: var(--font);
@@ -815,3 +816,188 @@ body.portrait #rotate-hint { display: block; }
 .btn.ghost-dark { background: #fff; box-shadow: none; }
 .tut-focus { outline: 5px solid #b28ad6; outline-offset: 4px; border-radius: 16px; animation: zglowo 1.4s infinite; }
 @keyframes zglowo { 50% { outline-color: #e6d4f5; } }
+
+/* ===================== 흥화진 전술 퍼즐 v3 ===================== */
+.plan-badge { position: absolute; left: 16px; top: 96px; background: rgba(122, 74, 154, .92); color: #fff; font-weight: 800; font-size: 15px; padding: 5px 12px; border-radius: 999px; }
+.pz-plan .flood { opacity: 0; transform-box: fill-box; transform-origin: center; transform: scale(.4); transition: opacity .8s, transform .8s; }
+.pz-plan.pv-flood .flood { opacity: .85; transform: scale(1); }
+.pz-plan.pv-dry .w-down { opacity: .12; }
+.pz-plan.pv-dry .flow path:nth-child(n+2) { opacity: .15; }
+.pz-plan .trib { transition: opacity .8s; }
+.pz-plan.pv-trib .trib { opacity: .25; }
+.pz-plan.released .w-down { opacity: 1; transition: opacity .5s .3s; }
+.pz-plan.released .pwave { animation: sweep 1.3s ease-in forwards; }
+.pz-plan.pv-trib.released .pwave { animation: none; }
+.pz-plan.pv-trib.released .trib { opacity: 1; }
+.dam-pop { animation: pop .4s; transform-box: fill-box; transform-origin: center; }
+.far-path { fill: none; stroke: #c0392b; stroke-width: 4; stroke-dasharray: 8 8; opacity: .8; }
+.pz-plan .ally { transition: opacity .3s; }
+.pz-plan .ally.in-forest { opacity: .35; }
+.pz-plan .ally.charging { opacity: 1; }
+.pz-plan .ally.late .ar .body { animation: trot .5s infinite alternate; }
+.pz-plan .ally.late { transform: translate(260px, 560px) !important; transition: transform 2.2s linear !important; }
+@keyframes trot { to { transform: translateY(-4px); } }
+.pz-plan .enemy { transform: translate(0px, -220px); }
+.er .body, .ar .body { transform-box: fill-box; transform-origin: center; transition: transform 1.1s ease-in, opacity 1.1s; }
+.er.tumble .body { transform: translate(var(--dx), 40px) rotate(var(--rot)); opacity: .6; }
+.er.turn .body { transform: scaleX(-1); transition: transform .3s; }
+.mark { fill: #c0392b; stroke: #fff; stroke-width: 5; paint-order: stroke; }
+.pz-plan.blocked .enemy { animation: shake .5s; }
+.splash .drop { animation: splash .9s ease-out forwards; animation-delay: calc(var(--i) * .08s); }
+@keyframes splash { from { r: 4; opacity: 1; } to { r: 40; opacity: 0; } }
+.plan-tags { position: absolute; inset: 0; pointer-events: none; }
+.pv-tag { position: absolute; transform: translateX(-50%); white-space: nowrap; font-size: 15px; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: #fff; border: 2px solid #8a6a3a; animation: pop .35s; }
+.pv-tag.dry, .pv-tag.hidden { border-color: #2f7d6d; }
+.pv-tag.flood, .pv-tag.seen, .pv-tag.far, .pv-tag.trib { border-color: #c98a1c; }
+.plan-token { flex-wrap: wrap; touch-action: none; cursor: grab; }
+.plan-token small { width: 100%; font-size: 12.5px; color: #8a6a3a; font-weight: 700; margin-left: 34px; }
+.plan-gauge { margin: 8px 0; }
+.plan-gauge > span { font-size: 14px; font-weight: 800; color: #6b4a2a; }
+.plan-gauge .track { position: relative; height: 18px; border-radius: 9px; background: #e8dcc0; margin: 4px 0; overflow: hidden; }
+.plan-gauge .zone { position: absolute; top: 0; bottom: 0; background: #7fb3d5; }
+.plan-gauge .dot { position: absolute; top: 1px; width: 16px; height: 16px; border-radius: 50%; background: #6b3f22; transform: translateX(-50%); }
+.plan-gauge small { display: flex; justify-content: space-between; font-size: 12.5px; color: #6b5a3a; }
+.plan-gauge small em { font-style: normal; }
+.plan-blast { width: 100%; font-size: 24px; min-height: 64px; animation: pulse 1s infinite; }
+.plan-result { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(10, 8, 20, .3); z-index: 4; }
+.pr-card { width: 520px; padding: 20px 24px; border-radius: 20px; background: var(--paper); border: 5px solid var(--red); text-align: center; animation: pop .35s; }
+.pr-card.good { border-color: var(--gold); box-shadow: 0 0 0 10px rgba(255, 216, 102, .35); }
+.pr-card b { display: block; font-size: 30px; font-family: var(--serif); }
+.pr-card.good b { color: var(--red); }
+.pr-card p { font-size: 18px; line-height: 1.55; margin: 10px 0 14px; word-break: keep-all; }
+.pr-card small { display: block; color: #7a4a9a; font-weight: 700; margin-top: 6px; }
+
+/* ===================== 강동 6주 v3 ===================== */
+.zone-glow.found { fill: rgba(47, 125, 109, .18); stroke: #2f7d6d; stroke-dasharray: 10 8; animation: none; }
+.site circle { fill: rgba(255, 255, 255, .75); stroke: #8e2a22; stroke-width: 3; stroke-dasharray: 5 4; }
+.site text { font-size: 18px; font-weight: 900; fill: #8e2a22; pointer-events: none; }
+.site-in { animation: pop .4s both; animation-delay: var(--d); transform-box: fill-box; transform-origin: center; }
+.site.nope circle { stroke: #c0392b; fill: #fbe3df; }
+.site.nope .site-in { animation: shake .45s; }
+.castle-mark .rise { transform-box: fill-box; transform-origin: center bottom; animation: rise-up .5s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes rise-up { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.castle-mark .dust circle { fill: #c9b79a; opacity: 0; animation: dust .7s ease-out; }
+@keyframes dust { 0% { opacity: .9; r: 4; } 100% { opacity: 0; r: 18; } }
+.castle-mark .lbl { animation: rise .4s .3s both; }
+.territory { fill: rgba(142, 42, 34, 0); transition: fill 1.4s; }
+.territory.on { fill: rgba(142, 42, 34, .22); }
+.tok-card { margin-top: 10px; padding: 8px 12px; border-radius: 12px; background: #fff; border: 3px solid #8e2a22; }
+.tok-card b { font-size: 16px; color: #8e2a22; }
+.tok-card p { margin: 4px 0 0; font-size: 16px; line-height: 1.45; }
+.tok-card small { display: block; margin-top: 4px; font-size: 12.5px; color: #7a6a4a; }
+.map-banner { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); background: rgba(251, 243, 223, .96); border: 5px solid var(--red); border-radius: 20px; padding: 14px 28px; font-size: 28px; font-weight: 900; color: var(--red); font-family: var(--serif); animation: pop .5s; white-space: nowrap; pointer-events: none; }
+.map-side .tokens .castle-token .ico svg { display: block; }
+
+/* ===================== 담판 v3 ===================== */
+.db-fig.react svg { animation: pop .35s; }
+.db-rope { position: absolute; left: 340px; right: 340px; top: 426px; display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 800; color: #fff; }
+.db-rope span { background: rgba(43, 29, 20, .75); padding: 2px 10px; border-radius: 999px; }
+.db-rope .rope { position: relative; flex: 1; height: 10px; border-radius: 5px; background: repeating-linear-gradient(60deg, #c9a46a 0 8px, #a07a46 8px 16px); }
+.db-rope .knot { position: absolute; top: -9px; left: 50%; width: 26px; height: 26px; margin-left: -13px; border-radius: 50%; background: #b8352a; border: 3px solid #fff; transition: left 1s cubic-bezier(.3, 1.4, .5, 1); }
+.db-rope .rope::before { content: ''; position: absolute; left: 50%; top: -8px; bottom: -8px; border-left: 3px dashed rgba(255, 255, 255, .7); }
+.db-meter { top: 470px; }
+.db-bubble .weak { font: inherit; color: inherit; background: #fff5c2; border: 0; border-bottom: 3px dashed #c98a1c; padding: 0 3px; cursor: pointer; border-radius: 4px; }
+.db-bubble .weak:hover { background: #ffe58a; }
+.db-bubble .weak.nope { background: #f2e6e3; color: #9a8a7a; text-decoration: line-through; border-bottom-color: #c0392b; animation: shake .4s; }
+.db-bubble mark.weak.hit, .db-bubble .weak.hit { background: #ffd2c9; border-bottom: 3px solid #b8352a; }
+.db-hand .cards.waiting .clue-card { opacity: .55; }
+.db-hand-title .ttl.blink { animation: shake .45s; color: #fff; }
+.clue-card.flying { position: absolute; z-index: 20; margin: 0; transition: left .6s cubic-bezier(.3, .9, .4, 1), top .6s cubic-bezier(.3, .9, .4, 1), transform .6s, opacity .3s; box-shadow: 0 12px 30px rgba(0, 0, 0, .45); pointer-events: none; }
+.clue-card.flying.gone { opacity: 0; }
+.db-deal { gap: 10px; }
+.deal-side { width: 230px; display: flex; flex-direction: column; gap: 6px; justify-content: center; }
+.deal-side .scale span { font-size: 13.5px; font-weight: 800; color: #f3d27a; }
+.deal-side .sbar { height: 14px; border-radius: 7px; background: #4a3a2a; overflow: hidden; }
+.deal-side .sbar i { display: block; height: 100%; width: 50%; transition: width .5s; }
+.deal-side .k i { background: linear-gradient(90deg, #a07a46, #d9c3a0); }
+.deal-side .gr i { background: linear-gradient(90deg, #8e2a22, #e86a5a); }
+.deal-side .deal-go { margin-top: 4px; }
+.pz-debate.won .db-fig.left svg { animation: float 1.2s infinite; }
+.pz-debate .sig-banner { z-index: 30; }
+.pz-debate.banner-on .sig-banner { transform: translate(-50%, -50%) scale(1); }
+.pz-debate .sig-banner b { font-size: 64px; }
+
+/* ===================== 3차 침입 작전 v3 ===================== */
+.mk { transition: transform .6s ease-in-out; }
+.mk circle { stroke: #fff; stroke-width: 4; }
+.mk text { font-size: 17px; font-weight: 900; fill: #fff; pointer-events: none; }
+.mk.enemy circle { fill: #6b3f22; }
+.mk.ally circle { fill: #2f5d8a; }
+.route.ghost { stroke: rgba(184, 53, 42, .25); animation: none; }
+.route.trail { stroke: #b8352a; stroke-dasharray: 0 2000; transition: stroke-dasharray .6s; animation: none; }
+.intel-card.new { animation: pop .4s; border-color: var(--gold); }
+.next-news { margin: -4px 0 10px; }
+.siege-ring { fill: none; stroke: #c0392b; stroke-width: 4; stroke-dasharray: 8 6; animation: spin 1.3s linear infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.whatif .food { font-size: 26px; animation: fadeout 1.3s forwards; }
+@keyframes fadeout { to { opacity: 0; transform: translateY(10px); } }
+.whatif .cut { stroke: #c0392b; stroke-width: 6; stroke-dasharray: 10 8; }
+.whatif-label { font-size: 16px; font-weight: 800; fill: #7a4a9a; stroke: #fff; stroke-width: 4; paint-order: stroke; }
+.army-token { display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding: 10px 14px; margin: 6px 0; font-size: 22px; font-weight: 900; color: #fff; background: #2f5d8a; border: 3px solid #1f4060; border-radius: 14px; cursor: grab; touch-action: none; box-shadow: 0 4px 0 #1f4060; }
+.army-token small { font-size: 13.5px; font-weight: 700; opacity: .9; }
+.map-target.small { font-size: 15px; padding: 5px 12px; animation: none; opacity: .9; }
+.clash-ring { fill: rgba(255, 216, 102, .4); stroke: var(--gold); stroke-width: 4; animation: pulse 1s infinite; }
+.rain { position: absolute; left: 0; top: 0; width: 880px; height: 720px; overflow: hidden; pointer-events: none; opacity: 0; transition: opacity .6s; }
+[data-wind='south'] .rain { opacity: 1; }
+.rain i { position: absolute; width: 2px; height: 26px; background: rgba(180, 210, 235, .8); transform: rotate(15deg); animation: rainfall .7s linear infinite; }
+.rain i:nth-child(1) { left: 0px; animation-delay: 0.00s; }
+.rain i:nth-child(2) { left: 29px; animation-delay: 0.07s; }
+.rain i:nth-child(3) { left: 58px; animation-delay: 0.14s; }
+.rain i:nth-child(4) { left: 87px; animation-delay: 0.21s; }
+.rain i:nth-child(5) { left: 116px; animation-delay: 0.28s; }
+.rain i:nth-child(6) { left: 145px; animation-delay: 0.35s; }
+.rain i:nth-child(7) { left: 174px; animation-delay: 0.42s; }
+.rain i:nth-child(8) { left: 203px; animation-delay: 0.49s; }
+.rain i:nth-child(9) { left: 232px; animation-delay: 0.56s; }
+.rain i:nth-child(10) { left: 261px; animation-delay: 0.63s; }
+.rain i:nth-child(11) { left: 290px; animation-delay: 0.00s; }
+.rain i:nth-child(12) { left: 319px; animation-delay: 0.07s; }
+.rain i:nth-child(13) { left: 348px; animation-delay: 0.14s; }
+.rain i:nth-child(14) { left: 377px; animation-delay: 0.21s; }
+.rain i:nth-child(15) { left: 406px; animation-delay: 0.28s; }
+.rain i:nth-child(16) { left: 435px; animation-delay: 0.35s; }
+.rain i:nth-child(17) { left: 464px; animation-delay: 0.42s; }
+.rain i:nth-child(18) { left: 493px; animation-delay: 0.49s; }
+.rain i:nth-child(19) { left: 522px; animation-delay: 0.56s; }
+.rain i:nth-child(20) { left: 551px; animation-delay: 0.63s; }
+.rain i:nth-child(21) { left: 580px; animation-delay: 0.00s; }
+.rain i:nth-child(22) { left: 609px; animation-delay: 0.07s; }
+.rain i:nth-child(23) { left: 638px; animation-delay: 0.14s; }
+.rain i:nth-child(24) { left: 667px; animation-delay: 0.21s; }
+.rain i:nth-child(25) { left: 696px; animation-delay: 0.28s; }
+.rain i:nth-child(26) { left: 725px; animation-delay: 0.35s; }
+.rain i:nth-child(27) { left: 754px; animation-delay: 0.42s; }
+.rain i:nth-child(28) { left: 783px; animation-delay: 0.49s; }
+.rain i:nth-child(29) { left: 812px; animation-delay: 0.56s; }
+.rain i:nth-child(30) { left: 841px; animation-delay: 0.63s; }
+
+@keyframes rainfall { from { top: -30px; } to { top: 720px; } }
+.pz-campaign.go .enemy-army { opacity: 0; transform: translate(0, -260px); }
+
+/* ===================== 기록 복원 v3 ===================== */
+.tl-chain { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
+.tl-thread { fill: none; stroke: var(--gold); stroke-width: 6; stroke-linecap: round; stroke-dasharray: 300; stroke-dashoffset: 300; animation: drawline .6s forwards; filter: drop-shadow(0 0 4px #ffd866); }
+.tl-card .played { position: absolute; top: 4px; left: 50%; transform: translateX(-50%); font-style: normal; font-size: 11.5px; font-weight: 800; color: #fff; background: #7a4a9a; padding: 1px 8px; border-radius: 999px; white-space: nowrap; }
+.rs-eras { position: absolute; left: 30px; right: 30px; top: 300px; display: flex; gap: 8px; opacity: 0; transform: translateY(20px); transition: opacity .5s, transform .8s, top .8s; }
+.eras-on .rs-eras { opacity: 1; transform: none; }
+.eras-up .rs-eras { opacity: .0; top: 10px; }
+.rs-era { position: relative; flex: 1; height: 120px; border-radius: 14px; border: 3px dashed rgba(255, 255, 255, .35); color: #cfc6e8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center; font-size: 13px; }
+.rs-era span { font-size: 28px; filter: grayscale(1); opacity: .6; }
+.rs-era b { font-size: 14px; word-break: keep-all; }
+.rs-era.had { border-style: solid; border-color: var(--c); }
+.rs-era.target { border-color: var(--gold-l); box-shadow: 0 0 0 4px rgba(255, 216, 102, .3); }
+.rs-era.target.filled { background: var(--c); border-style: solid; color: #fff; box-shadow: 0 0 30px rgba(255, 216, 102, .8); animation: pop .5s; }
+.rs-era.target.filled span { filter: none; opacity: 1; }
+.rs-chip { position: absolute; font-style: normal; font-size: 12px; font-weight: 800; background: #fbf3df; color: #3b2a1a; padding: 2px 6px; border-radius: 6px; animation: chipin .6s both; left: calc(10% + (var(--i) % 3) * 30%); top: calc(-60px + var(--i) * 4px); }
+@keyframes chipin { from { transform: translateY(-140px) scale(1.4); opacity: 0; } 70% { opacity: 1; } to { transform: translateY(80px) scale(.6); opacity: 0; } }
+
+.camp-side { overflow-y: auto; }
+.camp-side .intel { gap: 6px; margin-bottom: 8px; }
+.camp-side .intel-card { padding: 5px 9px; }
+.camp-side .intel-card p { font-size: 14px; line-height: 1.35; }
+.camp-side .intel-card > span { font-size: 22px; }
+.camp-side .q { font-size: 16.5px; margin: 0 0 8px; }
+.camp-side .db-choice { min-height: 44px; font-size: 15.5px; padding: 6px 12px; }
+.camp-side .opts { gap: 6px; }
+.rs-cap { position: absolute; left: 0; right: 0; top: 460px; text-align: center; font-size: 24px; font-weight: 800; color: var(--gold-l); opacity: 0; transition: opacity .5s; margin: 0; }
+.eras-on .rs-cap { opacity: 1; }

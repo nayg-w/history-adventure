@@ -8,6 +8,7 @@ HA.puzzles.timeline = function (cfg, g) {
     root.innerHTML = `
       <div class="paper-bg"></div>
       <header class="pz-head"><h3>${esc(cfg.title)}</h3><p>${esc(cfg.text)}</p></header>
+      <svg class="tl-chain" viewBox="0 0 1280 720" aria-hidden="true"></svg>
       <div class="tl-arrow" aria-hidden="true"><span>먼저</span><i></i><span>나중</span></div>
       <div class="tl-slots">${Array.from({ length: N }, (_, i) => `<div class="tl-slot" data-i="${i}" role="button" tabindex="0" aria-label="${i + 1}번째 자리"><em>${i + 1}</em></div>`).join('')}</div>
       <div class="tl-pool" aria-label="기록 조각 모음"></div>
@@ -24,7 +25,7 @@ HA.puzzles.timeline = function (cfg, g) {
     root.style.setProperty('--cw', Math.min(182, Math.floor((1200 - (N - 1) * 12) / N)) + 'px');
 
     scramble(cfg.cards).forEach((c) => {
-      const b = h(`<button class="tl-card" data-id="${c.id}"><span class="ico">${c.icon || '📜'}</span><span class="txt">${esc(c.text)}</span><span class="yr">${esc(c.year)}</span></button>`);
+      const b = h(`<button class="tl-card" data-id="${c.id}">${c.played ? '<em class="played" title="이 일은 기록자가 직접 해냈어요">🎮 직접 해낸 일</em>' : ''}<span class="ico">${c.icon || '📜'}</span><span class="txt">${esc(c.text)}</span><span class="yr">${esc(c.year)}</span></button>`);
       cards[c.id] = b;
       pool.appendChild(b);
       bind(b);
@@ -128,6 +129,26 @@ HA.puzzles.timeline = function (cfg, g) {
       locked.add(slot);
       card.classList.add('locked');
       slot.classList.add('locked');
+      drawChain();
+    }
+
+    /** 고정된 이웃 조각끼리 금실로 이어 '기록이 이어지는' 모습을 보여 준다 */
+    function drawChain() {
+      const chain = root.querySelector('.tl-chain');
+      const c = (el) => {
+        const r = el.getBoundingClientRect();
+        const a = HA.util.toStage(r.left + r.width / 2, r.top + r.height / 2);
+        return a;
+      };
+      let html = '';
+      for (let i = 0; i < slots.length - 1; i++) {
+        if (locked.has(slots[i]) && locked.has(slots[i + 1])) {
+          const a = c(slots[i]);
+          const b = c(slots[i + 1]);
+          html += `<path class="tl-thread" d="M${a.x} ${a.y - 70} Q${(a.x + b.x) / 2} ${a.y - 100} ${b.x} ${b.y - 70}"/>`;
+        }
+      }
+      chain.innerHTML = html;
     }
 
     checkBtn.onclick = async () => {
