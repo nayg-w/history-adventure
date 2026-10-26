@@ -49,11 +49,13 @@ const ok = (m) => console.log('  ✔ ' + m);
   await until(() => document.querySelector('.hs[data-hs="seohui"]') && !document.getElementById('fader').classList.contains('on') && !HA.main.game.busy, '조정');
   await page.click('.hs[data-hs="seohui"]');
   await until(() => document.querySelector('.db-hand .clue-card') && !document.getElementById('dialogue').classList.contains('on'), '첫째 주장');
+  await page.click('.db-bubble .weak:has-text("신라 땅에서")');
+  await until(() => document.querySelector('.db-bubble mark.weak.hit') && !document.getElementById('dialogue').classList.contains('on'), '약점');
   // 안융진 카드(-20)를 계속 내밀어 태도를 바닥내기
   let broke = false;
   for (let i = 0; i < 6 && !broke; i++) {
     await page.click('.clue-card[data-id="anyung"]');
-    await page.waitForTimeout(700);
+    await page.waitForTimeout(1100);
     if (await talking()) {
       const t = await page.textContent('.dlg-text');
       broke = /돌아가시오|깨질 뻔/.test(t);

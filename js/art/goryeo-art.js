@@ -311,7 +311,7 @@ HA.art.goryeo = (() => {
         <rect x="60" y="0" width="80" height="44" fill="#9b6b40"/><path d="M44 6 Q100 -22 156 6 L146 12 Q100 -8 54 12 Z" fill="#3c3a40"/>
         <text x="100" y="92" text-anchor="middle" font-size="20" font-weight="700" fill="#fbf2d8">흥화진</text>
       </g>
-      <g transform="translate(56 150)"><circle r="26" fill="#fff" stroke="#6b5a3a" stroke-width="3"/><path d="M0 -20 L7 4 L0 0 L-7 4 Z" fill="#b8352a"/><text y="-30" text-anchor="middle" font-size="16" font-weight="800" fill="#3b2a1a">북</text></g>
+      <g transform="translate(56 180)"><circle r="26" fill="#fff" stroke="#6b5a3a" stroke-width="3"/><path d="M0 -20 L7 4 L0 0 L-7 4 Z" fill="#b8352a"/><text y="-30" text-anchor="middle" font-size="16" font-weight="800" fill="#3b2a1a">북</text></g>
       <text x="740" y="40" text-anchor="middle" font-size="20" font-weight="700" fill="#4a5a6a">↓ 거란군이 내려오는 쪽 (북쪽)</text>`
     );
 
@@ -325,7 +325,7 @@ HA.art.goryeo = (() => {
       <text x="680" y="50" text-anchor="middle" font-size="20" font-weight="800" fill="#4a5a4a">↑ 압록강 · 거란으로 돌아가는 길 (북쪽)</text>
       <g transform="translate(80 640)"><rect width="180" height="50" fill="#8d8478"/>${Array.from({ length: 9 }, (_, i) => `<rect x="${i * 20}" y="-10" width="12" height="12" fill="#8d8478"/>`).join('')}
         <text x="90" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#fbf2d8">귀주</text></g>
-      <g transform="translate(56 150)"><circle r="26" fill="#fff" stroke="#6b5a3a" stroke-width="3"/><path d="M0 -20 L7 4 L0 0 L-7 4 Z" fill="#b8352a"/><text y="-30" text-anchor="middle" font-size="16" font-weight="800" fill="#3b2a1a">북</text></g>`
+      <g transform="translate(56 180)"><circle r="26" fill="#fff" stroke="#6b5a3a" stroke-width="3"/><path d="M0 -20 L7 4 L0 0 L-7 4 Z" fill="#b8352a"/><text y="-30" text-anchor="middle" font-size="16" font-weight="800" fill="#3b2a1a">북</text></g>`
     );
 
   /* ---------------- 귀주 들판 (1019) ---------------- */
