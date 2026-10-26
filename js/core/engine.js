@@ -118,7 +118,15 @@ HA.Game = class {
     HA.store.save();
     this.refreshHud();
     document.dispatchEvent(new CustomEvent('ha:clues'));
+    // 단서를 다 모아 새로 풀 수 있게 된 탐구 질문이 있으면 알려 준다 (어느 질문인지는 말하지 않음)
+    const ready = this.isInsight(id) ? [] : HA.deduce.readyQuestions(this).filter((x) => !this.flag('ready_' + x.id));
+    ready.forEach((x) => this.setFlag('ready_' + x.id));
     await HA.ui.gainCard(this.info(id), this.isInsight(id) ? 'insight' : 'clue');
+    if (ready.length) {
+      HA.ui.toast('🧩 추론판에 새로 풀어 볼 수 있는 질문이 생겼어요!');
+      const b = document.querySelector('.hud-deduce');
+      if (b) b.classList.add('ping');
+    }
   }
 
   /** 숨은 기록: 꼭 필요하지는 않지만 스스로 찾아낸 역사 이야기 */
@@ -263,6 +271,7 @@ HA.Game = class {
       <div class="hud-cap"><small></small><b></b></div>
       <div class="hud-btns">
         <button class="hud-btn hud-hint" aria-label="힌트 (H)"><span class="ico">💡</span><span>힌트</span></button>
+        ${this.ep.insights ? '<button class="hud-btn hud-deduce" aria-label="추론판 (D)"><span class="ico">🧩</span><span>추론판</span></button>' : ''}
         <button class="hud-btn hud-notebook" aria-label="기록 수첩 (N)"><span class="ico">📖</span><span>수첩</span><i class="badge"></i></button>
         <button class="hud-btn hud-menu" aria-label="메뉴 (Esc)"><span class="ico">☰</span><span>메뉴</span></button>
       </div>
@@ -270,6 +279,8 @@ HA.Game = class {
       <div class="hud-sel"></div>`;
     hud.querySelector('.hud-hint').onclick = () => this.hint();
     hud.querySelector('.hud-notebook').onclick = () => this.openNotebook();
+    const dd = hud.querySelector('.hud-deduce');
+    if (dd) dd.onclick = () => this.openNotebook('deduce');
     hud.querySelector('.hud-menu').onclick = () => this.menu();
   }
 
@@ -400,10 +411,12 @@ HA.Game = class {
     return t;
   }
 
-  openNotebook() {
+  openNotebook(tab) {
     if (HA.ui.isTalking()) return;
     HA.audio.play('page');
-    HA.ui.notebook(this);
+    const dd = document.querySelector('.hud-deduce');
+    if (tab === 'deduce' && dd) dd.classList.remove('ping');
+    HA.ui.notebook(this, tab);
   }
 
   menu() {
