@@ -136,35 +136,82 @@ async function clickMap(x, y) {
   await until(idle, 'idle');
   log('조정 단서 7개 + 숨은 기록 2개');
 
-  console.log('■ 추론판');
-  await page.click('.hud-notebook');
-  await page.click('[data-t="deduce"]');
-  async function deduce(a, b, wrongText, rightText, id) {
-    await page.click(`.ded-chip[data-id="${a}"]`);
-    await page.click(`.ded-chip[data-id="${b}"]`);
-    await page.click('.ded-go');
-    if (wrongText) {
-      await page.click(`.ded-choice:has-text("${wrongText}")`);
-      await until(() => document.querySelector('.ded-why.bad'), '틀린 결론 이유');
-    }
-    await page.click(`.ded-choice:has-text("${rightText}")`);
-    await until(hasClue(id), 'insight ' + id);
-    await until(() => !document.querySelector('#toast .gain-card') && document.querySelector('.ded-chip'), '추론판 갱신');
-  }
-  await page.click('.ded-chip[data-id="balhae"]');
-  await page.click('.ded-chip[data-id="jurchen"]');
-  await page.click('.ded-go');
-  await until(() => /이어지지 않아요/.test(document.querySelector('.ded-msg')?.textContent || ''), '연결 없는 짝');
-  await page.click('.ded-chip[data-id="balhae"]');
-  await page.click('.ded-chip[data-id="jurchen"]');
-  log('연결고리 없는 단서 짝 → "이어지지 않아요"');
-  await deduce('nameGoryeo', 'seogyeong', '같은 해에', '이어받은 나라', 'heir');
-  await shot('deduce');
-  log('결론 고르기: 틀린 결론은 근거로 반박됨 → heir');
-  await deduce('jurchen', 'claimSong', null, '길이 열리면', 'route');
-  await deduce('anyung', 'claimSong', '모두 차지할', '송 대신', 'aim');
+  console.log('■ 추론판 — 처음 사용 안내');
+  await page.click('.hud-deduce');
+  await until(() => document.querySelector('.dq-tut'), '사용법 안내 표시');
+  await shot('deduce-tutorial');
+  await page.click('.dq-next');
+  if (!/단서 고르기/.test(await page.textContent('.dq-tut h4'))) throw new Error('안내 2단계 아님');
+  await page.click('.dq-skip');
+  if (await page.locator('.dq-tut').count()) throw new Error('건너뛰기 안 됨');
+  if ((await page.locator('.dq-card.sel').count()) || (await page.locator('.dq-step.done').count())) throw new Error('안내가 답을 채움');
   await page.click('.modal-x');
-  log('추론 3개 완성 (heir, route, aim)');
+  await page.keyboard.press('d');
+  await until(() => document.querySelector('.ded2'), '단축키 D');
+  if (await page.locator('.dq-tut').count()) throw new Error('안내가 다시 나타남');
+  log('첫 사용 안내(3단계, 건너뛰기 가능) — 답을 채우지 않고, 다시 나타나지 않음');
+
+  console.log('■ 추론판 — 질문·단서·힌트·피드백');
+  const goal = await page.textContent('.dq-goal h3');
+  if (!/고구려의 옛 땅/.test(goal)) throw new Error('첫 질문이 아님: ' + goal);
+  if ((await page.locator('.dq-group').count()) !== 3) throw new Error('단서 갈래 표시 오류');
+  await page.click('.dq-info[data-id="seogyeong"]');
+  await until(() => /서희의 이야기/.test(document.querySelector('.dq-from')?.textContent || ''), '얻은 곳 다시 보기');
+  await shot('deduce-detail');
+  await page.click('.dq-close');
+  log('탐구 질문 표시, 단서 3갈래, ⓘ로 얻은 곳·내용 다시 보기');
+  // 3단계 힌트 (누를 때만)
+  if (await page.locator('.dq-hinttext span').count()) throw new Error('힌트가 저절로 보임');
+  for (let i = 1; i <= 3; i++) {
+    await page.click('.dq-hint');
+    if (!new RegExp(i + '단계').test(await page.textContent('.dq-hinttext'))) throw new Error('힌트 단계 오류 ' + i);
+  }
+  const h3 = await page.textContent('.dq-hinttext');
+  if (/나라 이름 '高麗'|서경\(평양\)/.test(h3) || !/연결 힌트/.test(h3)) throw new Error('힌트가 단서 이름을 그대로 공개함');
+  await shot('deduce-hints');
+  log('힌트는 요청할 때만, 1 생각 방향 → 2 찾아볼 범위 → 3 연결 힌트 (단서 이름은 공개 안 함)');
+  async function pickPair(a, b) {
+    await page.click(`.dq-sel[data-id="${a}"]`);
+    await page.click(`.dq-sel[data-id="${b}"]`);
+    await page.click('.dq-go');
+  }
+  async function clearSlots() {
+    for (const i of [1, 0]) if (await page.locator(`.dq-slot[data-s="${i}"].full`).count()) await page.click(`.dq-slot[data-s="${i}"]`);
+  }
+  await pickPair('balhae', 'jurchen');
+  const fb1 = await page.textContent('.dq-msg.bad');
+  await clearSlots();
+  await pickPair('nameGoryeo', 'claimLand');
+  const fb2 = await page.textContent('.dq-msg.bad');
+  await clearSlots();
+  await pickPair('jurchen', 'claimSong');
+  const fb3 = await page.textContent('.dq-msg.bad');
+  await shot('deduce-wrong');
+  if (!/발해 이야기/.test(fb1) || !/하나는 이 질문과/.test(fb2) || !/주장 그 자체/.test(fb2) || !/교류를 못 했나/.test(fb3)) throw new Error('오답 피드백 오류:\n' + [fb1, fb2, fb3].join('\n'));
+  log('오답 피드백이 고른 단서마다 다름 (관련 없는 단서 / 반쪽 근거 / 다른 질문의 짝)');
+  await clearSlots();
+  async function solve(q, a, b, wrongText, rightText) {
+    await page.click(`.dq-step[data-q="${q}"]`);
+    await pickPair(a, b);
+    await until(() => document.querySelector('.dq-link.tied'), '실 이어짐');
+    if (wrongText) {
+      await page.click(`.dq-choice:has-text("${wrongText}")`);
+      await until(() => document.querySelector('.dq-why.bad'), '틀린 결론 이유');
+    }
+    await page.click(`.dq-choice:has-text("${rightText}")`);
+    await until(hasClue(q), 'insight ' + q);
+    await until(`!document.querySelector('#toast .gain-card') && !!document.querySelector('.dq-step.done[data-q="${q}"]')`, '추론판 갱신');
+  }
+  await solve('heir', 'nameGoryeo', 'seogyeong', '같은 해에', '이어받은 나라');
+  log('맞는 짝 → 실이 이어지고, 근거에 맞는 결론 고르기 → heir');
+  if (!/거란의 속셈|교류를 못/.test(await page.textContent('.dq-step.cur'))) throw new Error('다음 질문으로 넘어가지 않음');
+  await solve('route', 'claimSong', 'jurchen', null, '길이 열리면');
+  await solve('aim', 'anyung', 'claimSong', '모두 차지할', '송 대신');
+  if ((await page.locator('.dq-step.done').count()) !== 3) throw new Error('해결 표시 오류');
+  if (!(await page.locator('.dq-step[data-q="why3"]').isDisabled())) throw new Error('4번째 질문이 미리 열림');
+  await shot('deduce-done');
+  await page.click('.modal-x');
+  log('조정 질문 3개 해결, 1018년 질문은 잠김 상태');
 
   console.log('■ 퍼즐 1: 담판 (이어서)');
   await clickHs('seohui');
@@ -216,9 +263,12 @@ async function clickMap(x, y) {
   await clickHs('tent');
   await until(() => (JSON.parse(localStorage.getItem('history-adventure-save-v1')).episodes['goryeo-khitan'].secrets || []).includes('nakseong'), 'nakseong');
   await until(idle, 'idle');
-  await page.click('.hud-notebook');
-  await page.click('[data-t="deduce"]');
-  await deduce('gangdong', 'demand', '거짓 약속', '되찾으려', 'why3');
+  await page.click('.hud-deduce');
+  await until(() => /1018년, 거란은 왜/.test(document.querySelector('.dq-goal h3')?.textContent || ''), '진영에서는 새 질문이 바로 열림');
+  await pickPair('invasion2', 'demand');
+  if (!/8년 전 2차 침입/.test(await page.textContent('.dq-msg.bad'))) throw new Error('진영 오답 피드백 오류');
+  await clearSlots();
+  await solve('why3', 'demand', 'gangdong', '거짓 약속', '되찾으려');
   await page.click('.modal-x');
   log('추론: 강동 6주 + 거란의 글 → 3차 침입의 까닭 (앞 구간 단서 활용)');
   await clickHs('gang');

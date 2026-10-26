@@ -301,6 +301,7 @@ HA.main = (() => {
     if (HA.ui.isModalOpen() || !game || !game.alive) return;
     if (e.key === 'h' || e.key === 'H' || e.key === 'ㅗ') game.hint();
     if (e.key === 'n' || e.key === 'N' || e.key === 'ㅜ') game.openNotebook();
+    if ((e.key === 'd' || e.key === 'D' || e.key === 'ㅇ') && game.ep.insights) game.openNotebook('deduce');
   }
 
   function init() {

@@ -91,6 +91,34 @@ const ok = (m) => console.log('  ✔ ' + m);
   if (!/첫째 주장/.test(await page.textContent('.db-steps .cur'))) throw new Error('단계 유지 안 됨');
   ok('메뉴로 나갔다 와도 담판 단계 유지');
 
+  console.log('■ 추론판 저장·이어하기');
+  await page.evaluate((k) => {
+    const s = JSON.parse(localStorage.getItem(k));
+    const e = s.episodes['goryeo-khitan'];
+    e.clues = ['claimLand', 'claimSong', 'nameGoryeo', 'seogyeong', 'jurchen', 'anyung', 'balhae', 'heir'];
+    e.flags = { entered_court: true };
+    delete s.settings.dedTutorialSeen;
+    localStorage.setItem(k, JSON.stringify(s));
+  }, KEY);
+  await page.reload();
+  await page.click('[data-a="continue"]');
+  await until(() => document.querySelector('.hud-deduce') && !document.getElementById('fader').classList.contains('on') && !HA.main.game.busy, '조정');
+  await page.click('.hud-deduce');
+  await until(() => document.querySelector('.dq-tut'), '안내');
+  await page.click('.dq-skip');
+  const done = await page.locator('.dq-step.done[data-q="heir"]').count();
+  const cur = await page.textContent('.dq-step.cur');
+  if (!done || !/교류를 못/.test(cur)) throw new Error('추론 저장 상태 오류: ' + cur);
+  await page.click('.dq-sel[data-id="anyung"]');
+  await page.reload();
+  await page.click('[data-a="continue"]');
+  await until(() => document.querySelector('.hud-deduce') && !document.getElementById('fader').classList.contains('on') && !HA.main.game.busy, '조정2');
+  await page.click('.hud-deduce');
+  await page.waitForTimeout(300);
+  if (await page.locator('.dq-tut').count()) throw new Error('새로고침 뒤 안내가 다시 나타남');
+  if (await page.locator('.dq-card.sel').count()) throw new Error('고르다 만 단서가 남음');
+  ok('해결한 추론은 저장되어 다음 질문부터, 안내는 한 번만, 고르다 만 단서는 깨끗이 비워짐');
+
   await browser.close();
   if (errors.length) throw new Error('브라우저 오류: ' + errors.join('\n'));
   console.log('\n경계 상황 테스트 통과 ✅');
