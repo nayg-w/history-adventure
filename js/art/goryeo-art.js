@@ -288,6 +288,46 @@ HA.art.goryeo = (() => {
       <text x="640" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="#4a5a6a">↓ 거란군이 내려오는 쪽 (북쪽)</text>`
     );
 
+  /* ---------------- 흥화진 작전도 (위에서 본 모습, 게임용 단순화) ---------------- */
+  A.river = 'M0 316 Q320 296 640 318 T1280 312 L1280 444 Q960 462 640 440 T0 446 Z';
+  A.planField = () =>
+    svg(
+      '0 0 1280 720',
+      `<defs><linearGradient id="pf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3ebf0"/><stop offset="1" stop-color="#f4f7f9"/></linearGradient></defs>
+      <rect width="1280" height="720" fill="url(#pf)"/>
+      <path d="M0 0 H1280 V110 Q1100 150 900 120 Q700 90 500 130 Q300 160 0 120 Z" fill="#b8c7d2"/>
+      <path d="M0 0 H1280 V60 Q1000 90 800 60 Q560 30 300 70 Q140 90 0 60 Z" fill="#9fb3c8"/>
+      <path d="M0 316 Q320 296 640 318 T1280 312 L1280 444 Q960 462 640 440 T0 446 Z" fill="#c9b79a"/>
+      <path d="M752 96 Q770 160 780 220 Q790 280 830 326 L860 326 Q820 280 812 220 Q804 160 790 96 Z" fill="#c9b79a"/>
+      <g fill="#a99878">${Array.from({ length: 9 }, (_, i) => `<ellipse cx="${540 + i * 22}" cy="${352 + ((i * 37) % 60)}" rx="9" ry="5"/>`).join('')}</g>
+      <path d="M520 470 Q600 486 700 470" stroke="#8a7a5a" stroke-width="3" stroke-dasharray="6 6" fill="none"/>
+      <text x="610" y="500" text-anchor="middle" font-size="18" font-weight="800" fill="#6b5a3a">여울 (얕아서 건너기 쉬운 곳)</text>
+      ${pine(660, 600, 0.9)}${pine(720, 640, 1.05)}${pine(800, 590, 0.95)}${pine(860, 650, 1.1)}${pine(760, 690, 1)}${pine(900, 590, 0.85)}${pine(620, 680, 0.9)}
+      <text x="780" y="520" text-anchor="middle" font-size="17" font-weight="800" fill="#2f5a4a">골짜기 숲</text>
+      <text x="440" y="590" text-anchor="middle" font-size="17" font-weight="800" fill="#8a9aa6">탁 트인 눈밭</text>
+      <g transform="translate(50 580)">
+        <rect x="0" y="40" width="200" height="70" fill="#8d8478"/>
+        ${Array.from({ length: 10 }, (_, i) => `<rect x="${i * 20}" y="30" width="12" height="12" fill="#8d8478"/>`).join('')}
+        <rect x="60" y="0" width="80" height="44" fill="#9b6b40"/><path d="M44 6 Q100 -22 156 6 L146 12 Q100 -8 54 12 Z" fill="#3c3a40"/>
+        <text x="100" y="92" text-anchor="middle" font-size="20" font-weight="700" fill="#fbf2d8">흥화진</text>
+      </g>
+      <g transform="translate(56 150)"><circle r="26" fill="#fff" stroke="#6b5a3a" stroke-width="3"/><path d="M0 -20 L7 4 L0 0 L-7 4 Z" fill="#b8352a"/><text y="-30" text-anchor="middle" font-size="16" font-weight="800" fill="#3b2a1a">북</text></g>
+      <text x="740" y="40" text-anchor="middle" font-size="20" font-weight="700" fill="#4a5a6a">↓ 거란군이 내려오는 쪽 (북쪽)</text>`
+    );
+
+  /* ---------------- 귀주 결전 (위에서 본 작전도) ---------------- */
+  A.guijuTop = () =>
+    svg(
+      '0 0 1280 720',
+      `<defs><linearGradient id="gt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfe6e0"/><stop offset="1" stop-color="#eef2ec"/></linearGradient></defs>
+      <rect width="1280" height="720" fill="url(#gt)"/>
+      <path d="M0 0 H900 V90 Q700 120 450 96 Q200 76 0 110 Z" fill="#b5c2b6"/>
+      <text x="680" y="50" text-anchor="middle" font-size="20" font-weight="800" fill="#4a5a4a">↑ 압록강 · 거란으로 돌아가는 길 (북쪽)</text>
+      <g transform="translate(80 640)"><rect width="180" height="50" fill="#8d8478"/>${Array.from({ length: 9 }, (_, i) => `<rect x="${i * 20}" y="-10" width="12" height="12" fill="#8d8478"/>`).join('')}
+        <text x="90" y="34" text-anchor="middle" font-size="20" font-weight="700" fill="#fbf2d8">귀주</text></g>
+      <g transform="translate(56 150)"><circle r="26" fill="#fff" stroke="#6b5a3a" stroke-width="3"/><path d="M0 -20 L7 4 L0 0 L-7 4 Z" fill="#b8352a"/><text y="-30" text-anchor="middle" font-size="16" font-weight="800" fill="#3b2a1a">북</text></g>`
+    );
+
   /* ---------------- 귀주 들판 (1019) ---------------- */
   A.guiju = () =>
     svg(

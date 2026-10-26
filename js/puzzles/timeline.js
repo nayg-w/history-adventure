@@ -20,6 +20,8 @@ HA.puzzles.timeline = function (cfg, g) {
     const locked = new Set();
     let sel = null;
     let hl = 0;
+    let checks = 0;
+    root.style.setProperty('--cw', Math.min(182, Math.floor((1200 - (N - 1) * 12) / N)) + 'px');
 
     scramble(cfg.cards).forEach((c) => {
       const b = h(`<button class="tl-card" data-id="${c.id}"><span class="ico">${c.icon || '📜'}</span><span class="txt">${esc(c.text)}</span><span class="yr">${esc(c.year)}</span></button>`);
@@ -129,6 +131,15 @@ HA.puzzles.timeline = function (cfg, g) {
     }
 
     checkBtn.onclick = async () => {
+      // 첫 확인에서는 몇 개가 맞았는지만 알려 준다 (어느 것인지는 비밀)
+      if (cfg.countFirst && checks++ === 0) {
+        const n = slots.filter((s, i) => cardIn(s) && cardIn(s).dataset.id === cfg.cards[i].id).length;
+        if (n < N) {
+          HA.audio.play(n ? 'click' : 'wrong');
+          say(`${N}개 가운데 ${n}개가 제자리에 있어요. 어느 것인지는 비밀! 바꿔 보고 다시 확인해요. (다음 확인부터는 맞은 조각이 고정돼요)`, n ? 'good' : 'bad');
+          return;
+        }
+      }
       let right = 0;
       const wrong = [];
       slots.forEach((s, i) => {

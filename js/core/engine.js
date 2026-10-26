@@ -12,11 +12,23 @@ HA.Game = class {
     this.selItem = null;
     this.puzzleHint = null;
     this.puzzleGoal = null;
+    this.hintStep = { key: null, level: 0 };
+    // 에피소드 내용이 바뀐 뒤의 옛 저장은 처음부터 (복원한 연대표 기록은 유지)
+    if (this.st.status === 'playing' && this.st.contentVersion !== ep.version) this.st = HA.store.resetEpisode(ep.id);
+    this.st.secrets = this.st.secrets || [];
+    this.st.stats = this.st.stats || { hints: 0 };
   }
 
   /* ---------- 상태 ---------- */
   has(clueId) {
     return this.st.clues.includes(clueId);
+  }
+  /** 단서 또는 추론 결과 */
+  info(id) {
+    return this.ep.clues[id] || (this.ep.insights || {})[id];
+  }
+  isInsight(id) {
+    return !!(this.ep.insights || {})[id];
   }
   hasItem(id) {
     return this.st.items.includes(id);
@@ -37,6 +49,9 @@ HA.Game = class {
     if (fresh || this.st.status !== 'playing') {
       this.st = HA.store.resetEpisode(this.ep.id);
       this.st.status = 'playing';
+      this.st.contentVersion = this.ep.version;
+      this.st.secrets = [];
+      this.st.stats = { hints: 0 };
       this.st.scene = this.ep.startScene;
       HA.store.save();
       if (this.ep.intro) {
@@ -102,7 +117,18 @@ HA.Game = class {
     this.st.newClues = (this.st.newClues || 0) + 1;
     HA.store.save();
     this.refreshHud();
-    await HA.ui.gainCard(this.ep.clues[id], 'clue');
+    document.dispatchEvent(new CustomEvent('ha:clues'));
+    await HA.ui.gainCard(this.info(id), this.isInsight(id) ? 'insight' : 'clue');
+  }
+
+  /** 숨은 기록: 꼭 필요하지는 않지만 스스로 찾아낸 역사 이야기 */
+  async findSecret(id) {
+    const sec = this.ep.secrets[id];
+    if (this.st.secrets.includes(id)) return this.say([{ who: 'pili', text: sec.text }]);
+    this.st.secrets.push(id);
+    HA.store.save();
+    await HA.ui.gainCard({ icon: '✨', title: `숨은 기록 ${this.st.secrets.length}/${Object.keys(this.ep.secrets).length}` }, 'secret');
+    await this.say([{ who: 'pili', text: sec.text }]);
   }
 
   async addItem(id) {
@@ -128,7 +154,7 @@ HA.Game = class {
     this.puzzleCaption = cfg.caption || null;
     this.refreshHud();
     try {
-      await fn(cfg, this);
+      return await fn(cfg, this);
     } finally {
       this.puzzleHint = null;
       this.puzzleGoal = null;
@@ -348,8 +374,9 @@ HA.Game = class {
     if (this.busy && !this.puzzleHint) return;
     HA.audio.play('click');
     let text;
+    this.st.stats.hints = (this.st.stats.hints || 0) + 1;
     if (this.puzzleHint) text = await this.puzzleHint();
-    else text = this.scene.hint ? this.scene.hint(this) : '주변을 눌러 살펴보세요.';
+    else text = this.stagedHint(this.scene.hint ? this.scene.hint(this) : '주변을 눌러 살펴보세요.');
     if (text) await this.say([{ who: 'pili', text }]);
   }
 
@@ -360,6 +387,17 @@ HA.Game = class {
         <button class="btn primary pic-ok">다 봤어요</button></figure>`, { cls: 'wide', onClose: resolve });
       document.querySelector('.pic-ok').onclick = () => HA.ui.closeModal();
     });
+  }
+
+  /** 힌트가 여러 단계(배열)면 누를 때마다 한 단계씩 구체적으로 알려 준다.
+      목표가 바뀌면 다시 첫 단계부터. */
+  stagedHint(h) {
+    if (!Array.isArray(h)) return h;
+    const key = this.st.scene + '|' + h[0];
+    if (this.hintStep.key !== key) this.hintStep = { key, level: 0 };
+    const t = h[Math.min(this.hintStep.level, h.length - 1)];
+    this.hintStep.level++;
+    return t;
   }
 
   openNotebook() {
